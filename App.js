@@ -20,11 +20,11 @@ export default function App() {
         screenOptions={{
           headerShown: true,
           drawerStyle: {
-            backgroundColor: '#007bff',
+            backgroundColor: '#FFB6C1',
             width: 240,
           },
-          drawerActiveTintColor: '#fff',
-          drawerInactiveTintColor: '#d1d1d1',
+          drawerActiveTintColor: '#000000',
+          drawerInactiveTintColor: '000000',
           drawerLabelStyle: {
             fontSize: 16,
           },
