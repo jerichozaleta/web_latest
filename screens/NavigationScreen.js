@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,19 @@ import {
   TouchableOpacity,
   Platform,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 const initialRegion = {
-  latitude: 13.6287846,
-  longitude: 123.2374283,
+  latitude: 13.6287846, // Latitude for Cararayan, Naga City
+  longitude: 123.2374283, // Longitude for Cararayan, Naga City
   latitudeDelta: 0.0922,
   longitudeDelta: 0.0421,
 };
 
-const WebViewComponent = (props: any) => {
+const WebViewComponent = (props) => {
   if (Platform.OS === 'web') {
     return <Text>WebView is not supported on this platform</Text>;
   } else {
@@ -29,6 +30,59 @@ const WebViewComponent = (props: any) => {
 };
 
 const NavigationScreen = () => {
+  const [incidents, setIncidents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchIncidents = async () => {
+      try {
+        const response = await fetch('http://192.168.100.184:10000/api/sos/all/');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Raw API response:', data); // Raw response for debugging
+        
+        if (Array.isArray(data)) {
+          setIncidents(data);
+        } else if (data.location) {
+          setIncidents([data.location]); // Handle if the response has a location
+        } else {
+          setIncidents([]);
+        }
+      } catch (error) {
+        console.error('Error fetching incidents:', error);
+        setIncidents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchIncidents();
+  }, []);
+
+  const generateMapMarkers = () => {
+    // Always place a marker for Cararayan first
+    let markers = `
+      L.marker([${initialRegion.latitude}, ${initialRegion.longitude}])
+        .addTo(map)
+        .bindPopup('Cararayan, Naga City<br>Lat: ${initialRegion.latitude.toFixed(4)}, Lng: ${initialRegion.longitude.toFixed(4)}');
+    `;
+
+    // Add markers for each incident
+    incidents
+      .filter((incident) => incident.latitude && incident.longitude) // Ensure valid coordinates
+      .forEach((incident) => {
+        markers += `
+          L.marker([${incident.latitude}, ${incident.longitude}])
+            .addTo(map)
+            .bindPopup('User: ${incident.username || 'Unknown'}<br>Lat: ${incident.latitude.toFixed(4)}, Lng: ${incident.longitude.toFixed(4)}');
+        `;
+      });
+
+    return markers;
+  };
+
   const leafletHtml = `
     <!DOCTYPE html>
     <html>
@@ -44,14 +98,12 @@ const NavigationScreen = () => {
       <div id="map"></div>
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       <script>
-        const map = L.map('map').setView([${initialRegion.latitude}, ${initialRegion.longitude}], 16);
+        const map = L.map('map').setView([${initialRegion.latitude}, ${initialRegion.longitude}], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: 'Map data © OpenStreetMap contributors',
         }).addTo(map);
-        L.marker([${initialRegion.latitude}, ${initialRegion.longitude}])
-          .addTo(map)
-          .bindPopup('Initial Location')
-          .openPopup();
+
+        ${generateMapMarkers()}
       </script>
     </body>
     </html>
@@ -72,13 +124,22 @@ const NavigationScreen = () => {
           </TouchableOpacity>
         </View>
         <ScrollView style={styles.listContainer}>
-          {[...Array(5)].map((_, index) => (
-            <View key={index} style={styles.listItem}>
-              <Text style={styles.listItemText}>🚨 Incident #{index + 1}</Text>
-              <Text style={styles.subText}>🧑 Admin Location: Bicol University</Text>
-              <Text style={styles.subText}>📍 Incident Location: Zone 4</Text>
-            </View>
-          ))}
+          {loading ? (
+            <ActivityIndicator size="large" color="#007AFF" />
+          ) : incidents.length === 0 ? (
+            <Text style={styles.subText}>No incidents found. Please check back later.</Text>
+          ) : (
+            incidents.map((incident, index) => (
+              <View key={incident._id || index} style={styles.listItem}>
+                <Text style={styles.listItemText}>🚨 Incident #{index + 1}</Text>
+                <Text style={styles.subText}>🧑 Admin: {incident.username || 'Unknown'}</Text>
+                <Text style={styles.subText}>
+                  📍 Location: Lat {incident.latitude?.toFixed(4) || 'N/A'}, Lng{' '}
+                  {incident.longitude?.toFixed(4) || 'N/A'}
+                </Text>
+              </View>
+            ))
+          )}
         </ScrollView>
       </View>
 
