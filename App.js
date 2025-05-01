@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './screens/LoginScreen';
+
+// Screens
 import DashboardScreen from './screens/DashboardScreen';
 import HomeScreen from './screens/HomeScreen';
 import NavigationScreen from './screens/NavigationScreen';
@@ -15,10 +17,12 @@ import LogoutScreen from './screens/LogoutScreen';
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
-// Drawer Navigator for the main app
+// Key for AsyncStorage
+const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1';
+
 const DrawerNavigator = () => (
   <Drawer.Navigator
-    initialRouteName="Dashboard"
+    initialRouteName="Dashboard" // Ensure this matches your default route
     screenOptions={{
       headerShown: true,
       drawerStyle: {
@@ -43,25 +47,47 @@ const DrawerNavigator = () => (
   </Drawer.Navigator>
 );
 
-// Main App with LoginScreen as the initial screen
 export default function App() {
+  const [isReady, setIsReady] = useState(false);
+  const [initialState, setInitialState] = useState();
+
+  useEffect(() => {
+    const restoreState = async () => {
+      try {
+        const savedStateString = await AsyncStorage.getItem(PERSISTENCE_KEY);
+        const state = savedStateString ? JSON.parse(savedStateString) : undefined;
+        setInitialState(state);
+      } catch (e) {
+        console.error('Failed to load navigation state', e);
+      } finally {
+        setIsReady(true);
+      }
+    };
+
+    restoreState();
+  }, []);
+
+  const onStateChange = useCallback(
+    async (state) => {
+      try {
+        await AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error('Failed to save navigation state', e);
+      }
+    },
+    []
+  );
+
+  if (!isReady) return null;
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="LoginScreen">
-        {/* Login Screen */}
-        <Stack.Screen
-          name="LoginScreen"
-          component={LoginScreen}
-          options={{ headerShown: false }} // Hide header for login
-        />
-        {/* Drawer Navigator */}
+    <NavigationContainer initialState={initialState} onStateChange={onStateChange}>
+      <Stack.Navigator initialRouteName="MainApp">
         <Stack.Screen
           name="MainApp"
-          component={NavigationScreen}
-          options={{ headerShown: false }} // Hide header for the drawer
-
+          component={DrawerNavigator}
+          options={{ headerShown: false }}
         />
-        {/* Additional Screens */}
         <Stack.Screen name="NavigationScreen" component={NavigationScreen} />
         <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
         <Stack.Screen name="PoliceStationScreen" component={PoliceStationScreen} />
