@@ -14,72 +14,11 @@ import {
 const { width, height } = Dimensions.get('window');
 
 const initialRegion = {
-  latitude: 13.6287846,
-  longitude: 123.2374283,
+  latitude: 13.628913,
+  longitude: 123.240131,
   latitudeDelta: 0.0922,
   longitudeDelta: 0.0421,
 };
-
-// Define Cararayan boundary data
-const cararayanCorners = [
-  { lat: 13.6357, lng: 123.2334, name: 'Cararayan North' },
-  { lat: 13.6257, lng: 123.2434, name: 'Cararayan East' },
-  { lat: 13.6157, lng: 123.2334, name: 'Cararayan South' },
-  { lat: 13.6257, lng: 123.2234, name: 'Cararayan West' },
-  { lat: 13.6327, lng: 123.2404, name: 'Cararayan Northeast' },
-  { lat: 13.6177, lng: 123.2404, name: 'Cararayan Southeast' },
-  { lat: 13.6177, lng: 123.2264, name: 'Cararayan Southwest' },
-  { lat: 13.6327, lng: 123.2264, name: 'Cararayan Northwest' }
-];
-
-// Define street corners/nodes throughout Cararayan
-// This represents a grid of streets covering the Cararayan area
-const cararayanStreetNodes = [
-  // Main streets running North-South
-  { lat: 13.6337, lng: 123.2274, name: 'Maharlika Highway & 1st St' },
-  { lat: 13.6337, lng: 123.2304, name: 'Maharlika Highway & 2nd St' },
-  { lat: 13.6337, lng: 123.2334, name: 'Maharlika Highway & 3rd St' },
-  { lat: 13.6337, lng: 123.2364, name: 'Maharlika Highway & 4th St' },
-  { lat: 13.6337, lng: 123.2394, name: 'Maharlika Highway & 5th St' },
-  
-  { lat: 13.6297, lng: 123.2274, name: 'Central Road & 1st St' },
-  { lat: 13.6297, lng: 123.2304, name: 'Central Road & 2nd St' },
-  { lat: 13.6297, lng: 123.2334, name: 'Central Road & 3rd St' },
-  { lat: 13.6297, lng: 123.2364, name: 'Central Road & 4th St' },
-  { lat: 13.6297, lng: 123.2394, name: 'Central Road & 5th St' },
-  
-  { lat: 13.6257, lng: 123.2274, name: 'Market Road & 1st St' },
-  { lat: 13.6257, lng: 123.2304, name: 'Market Road & 2nd St' },
-  { lat: 13.6257, lng: 123.2334, name: 'Market Road & 3rd St' },
-  { lat: 13.6257, lng: 123.2364, name: 'Market Road & 4th St' },
-  { lat: 13.6257, lng: 123.2394, name: 'Market Road & 5th St' },
-  
-  { lat: 13.6217, lng: 123.2274, name: 'School Road & 1st St' },
-  { lat: 13.6217, lng: 123.2304, name: 'School Road & 2nd St' },
-  { lat: 13.6217, lng: 123.2334, name: 'School Road & 3rd St' },
-  { lat: 13.6217, lng: 123.2364, name: 'School Road & 4th St' },
-  { lat: 13.6217, lng: 123.2394, name: 'School Road & 5th St' },
-  
-  { lat: 13.6177, lng: 123.2274, name: 'Southern Road & 1st St' },
-  { lat: 13.6177, lng: 123.2304, name: 'Southern Road & 2nd St' },
-  { lat: 13.6177, lng: 123.2334, name: 'Southern Road & 3rd St' },
-  { lat: 13.6177, lng: 123.2364, name: 'Southern Road & 4th St' },
-  { lat: 13.6177, lng: 123.2394, name: 'Southern Road & 5th St' },
-  
-  // Additional key locations
-  { lat: 13.6287, lng: 123.2374, name: 'Cararayan Plaza' },
-  { lat: 13.6247, lng: 123.2344, name: 'Cararayan Elementary School' },
-  { lat: 13.6267, lng: 123.2314, name: 'Cararayan Health Center' },
-  { lat: 13.6307, lng: 123.2344, name: 'Cararayan Church' },
-  { lat: 13.6227, lng: 123.2374, name: 'Cararayan Market' },
-  
-  // Additional street intersections (diagonal streets)
-  { lat: 13.6317, lng: 123.2284, name: 'Diagonal Ave & 1st St' },
-  { lat: 13.6297, lng: 123.2314, name: 'Diagonal Ave & 2nd St' },
-  { lat: 13.6277, lng: 123.2344, name: 'Diagonal Ave & 3rd St' },
-  { lat: 13.6257, lng: 123.2374, name: 'Diagonal Ave & 4th St' },
-  { lat: 13.6237, lng: 123.2404, name: 'Diagonal Ave & 5th St' }
-];
 
 // Conditionally import WebView to avoid issues on web
 const WebViewComponent = (props) => {
@@ -94,6 +33,7 @@ const WebViewComponent = (props) => {
 const NavigationScreen = () => {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDestination, setSelectedDestination] = useState(null);
   const webViewRef = useRef(null);
 
   useEffect(() => {
@@ -124,83 +64,31 @@ const NavigationScreen = () => {
     fetchIncidents();
   }, []);
 
+  const selectDestination = (pointName) => {
+    setSelectedDestination(pointName);
+    
+    if (webViewRef.current && Platform.OS !== 'web') {
+      // For React Native WebView
+      webViewRef.current.injectJavaScript(`
+        try {
+          const result = dijkstra(graph, 'defaultStartNode', '${pointName}');
+          drawRoute(result.path);
+          true; // This is needed for injectJavaScript
+        } catch(e) {
+          console.error('Error routing to ${pointName}:', e);
+          true;
+        }
+      `);
+    }
+  };
+
   const generateMapMarkers = () => {
-    // Main marker for Cararayan
+    // Main marker for the starting point
     let markers = `
-      // Main reference point for Cararayan
+      // Main reference point
       L.marker([${initialRegion.latitude}, ${initialRegion.longitude}])
         .addTo(map)
-        .bindPopup('Cararayan, Naga City<br>Lat: ${initialRegion.latitude.toFixed(4)}, Lng: ${initialRegion.longitude.toFixed(4)}');
-      
-      // Add markers for each boundary point of Cararayan
-      const cararayanBoundaries = ${JSON.stringify(cararayanCorners)};
-      
-      // Add markers for each boundary point
-      cararayanBoundaries.forEach(point => {
-        // Create a custom icon for corner markers
-        const cornerIcon = L.divIcon({
-          className: 'corner-marker',
-          html: '<div style="background-color: #3388ff; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff;"></div>',
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
-        });
-        
-        L.marker([point.lat, point.lng], {icon: cornerIcon})
-          .addTo(map)
-          .bindPopup(point.name + '<br>Lat: ' + point.lat.toFixed(4) + ', Lng: ' + point.lng.toFixed(4));
-      });
-      
-      // Create a polygon showing the approximate boundary of Cararayan
-      const boundaryCoords = cararayanBoundaries.map(point => [point.lat, point.lng]);
-      L.polygon(boundaryCoords, {
-        color: '#3388ff',
-        weight: 2,
-        fillColor: '#3388ff',
-        fillOpacity: 0.1
-      }).addTo(map).bindPopup('Cararayan Boundary');
-      
-      // Add street corners/nodes
-      const streetNodes = ${JSON.stringify(cararayanStreetNodes)};
-      
-      // Create a custom icon for street nodes
-      const streetNodeIcon = L.divIcon({
-        className: 'street-node-marker',
-        html: '<div style="background-color: #ffa500; width: 8px; height: 8px; border-radius: 50%; border: 1px solid #fff;"></div>',
-        iconSize: [10, 10],
-        iconAnchor: [5, 5]
-      });
-      
-      // Add markers for each street node
-      streetNodes.forEach(node => {
-        L.marker([node.lat, node.lng], {icon: streetNodeIcon})
-          .addTo(map)
-          .bindPopup(node.name + '<br>Lat: ' + node.lat.toFixed(4) + ', Lng: ' + node.lng.toFixed(4));
-      });
-      
-      // Add street lines connecting nodes
-      // Group nodes by street names to create street lines
-      const streets = {};
-      
-      // Extract street names from the nodes
-      streetNodes.forEach(node => {
-        const streetName = node.name.split(' & ')[0];
-        if (!streets[streetName]) {
-          streets[streetName] = [];
-        }
-        streets[streetName].push([node.lat, node.lng]);
-      });
-      
-      // Draw lines for each street
-      Object.keys(streets).forEach(streetName => {
-        if (streets[streetName].length > 1) {
-          L.polyline(streets[streetName], {
-            color: '#ff6b6b',
-            weight: 3,
-            opacity: 0.7,
-            dashArray: '5, 10'
-          }).addTo(map).bindPopup(streetName);
-        }
-      });
+        .bindPopup('Starting Point<br>Lat: ${initialRegion.latitude.toFixed(4)}, Lng: ${initialRegion.longitude.toFixed(4)}');
     `;
 
     // Add incident markers
@@ -224,110 +112,745 @@ const NavigationScreen = () => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
       <style>
-        html, body { 
-          height: 100%; 
-          margin: 0; 
-          padding: 0; 
-        }
-        #map { 
-          width: 100%; 
-          height: 100%; 
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-        }
-        .street-node-marker div {
-          transition: all 0.2s ease;
-        }
-        .street-node-marker div:hover {
-          transform: scale(1.5);
-          background-color: #ff4500 !important;
-        }
-        .corner-marker div {
-          transition: all 0.2s ease;
-        }
-        .corner-marker div:hover {
-          transform: scale(1.5);
-          background-color: #0056b3 !important;
-        }
-        .leaflet-popup-content {
-          font-family: Arial, sans-serif;
-          font-size: 12px;
-        }
-        .leaflet-popup-content-wrapper {
-          border-radius: 5px;
-        }
+        html, body { height: 100%; margin: 0; padding: 0; }
+        #map { width: 100%; height: 100%; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
+        .leaflet-popup-content { font-family: Arial, sans-serif; font-size: 12px; }
+        .leaflet-popup-content-wrapper { border-radius: 5px; }
       </style>
     </head>
     <body>
       <div id="map"></div>
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
       <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
+          const nodeCoordinates = {
+            defaultStartNode: [13.628913, 123.240131],
+        pointA: [13.628832, 123.240675],
+        pointB: [13.629782, 123.240870],
+        pointC: [13.629755, 123.241241],
+        pointD: [13.629759, 123.241730],
+        pointE: [13.630114, 123.241777],
+        pointF: [13.630495, 123.241833],
+        pointG: [13.630673, 123.241859],
+        pointH: [13.630496, 123.241354],
+        pointK: [13.630133, 123.241310],
+        pointL: [13.630542, 123.241007],
+        pointM: [13.630155, 123.240939],
+        pointN: [13.629856, 123.239827],
+        pointO: [13.630205, 123.239887],
+        pointP: [13.630572, 123.239963],
+        pointQ: [13.630320, 123.238813],
+        pointR: [13.630524, 123.238829],
+        pointS: [13.630702, 123.238855],
+        pointT: [13.630652, 123.238855],
+        pointU: [13.630952, 123.238855],
+        pointV: [13.631422, 123.238855],
+        pointW: [13.631812, 123.238875],
+        pointX: [13.631852, 123.239155],
+        pointY: [13.632102, 123.239185],
+        pointZ: [13.632002, 123.238555],
+        pointaa: [13.631822, 123.238535],
+        pointab: [13.631452, 123.238505],
+        pointac: [13.631432, 123.238635],
+        pointad: [13.630982, 123.238515],
+        extPointA: [13.635109, 123.214460],
+        extPointB: [13.635075, 123.214890],
+        extPointC: [13.635030, 123.215140],
+        extPointCtop1: [13.635305, 123.215150],
+        extPointCtop2: [13.635700, 123.215200],
+        extPointCtop3: [13.636030, 123.215250],
+        extPointCtop4: [13.636120, 123.215325],
+        extPointD: [13.634590, 123.215130],
+        extPointDleft1: [13.634560, 123.214120],
+        extPointE: [13.634580, 123.215300],
+        extPointF: [13.634580, 123.215300],
+        extPointG: [13.634580, 123.215450],
+        extPointH: [13.634540, 123.215650],
+        extPointHtop1: [13.63500, 123.215710],
+        extPointI: [13.634430, 123.216080],
+        extPointJ: [13.634170, 123.217000],
+        extPointK: [13.633860, 123.218000],
+        extPointL: [13.633570, 123.219000],
+        extPointM: [13.633180, 123.220000],
+        extPointN: [13.633145, 123.220385],
+        extPointNleft1: [13.633170, 123.220530],
+        extPointNleft2: [13.633200, 123.221260],
+        extPointNleft3: [13.633470, 123.221269],
+        extPointNleft4: [13.633859, 123.221159],
+        extPointNleft5: [13.634019, 123.221070],
+        extPointNleft6: [13.634139, 123.221070],
+        extPointNleft7: [13.634539, 123.221230],
+        extPointNleft8: [13.634409, 123.221200],
+        extPointNleft9: [13.634759, 123.221530],
+        extPointNleft10: [13.634759, 123.221610],
+        extPointNleft11: [13.6348500, 123.221893],
+        extPointNleft12: [13.6350200, 123.221953],
+        extPointNleft13: [13.6352600, 123.222133],
+        extPointNleft14: [13.6353950, 123.222283],
+        extPointO: [13.632880, 123.220500],
+        extPointP: [13.632600, 123.220550],
+        extPointQ: [13.632410, 123.220620],
+        extPointR: [13.632550, 123.220930],
+        extPointS: [13.632610, 123.221220],
+        extPointT: [13.632660, 123.221670],
+        extPointU: [13.632680, 123.221950],
+        extPointV: [13.632615, 123.222560],
+        extPointW: [13.632370, 123.223900],
+        extPointX: [13.632280, 123.224490],
+        extPointY: [13.632280, 123.224580],
+        extPointZ: [13.632200, 123.225160],
+        extPointaa: [13.632200, 123.225160],
+
+        newPointC: [13.629087, 123.238700],
+        newPointD: [13.628950, 123.239650],
+        newPointE: [13.629219,123.237519],
+        newPointE1: [13.629380, 123.236690],
+        newPointE2: [13.629790, 123.235925],
+        newPointE3: [13.630170, 123.235395],
+        newPointE4: [13.630570, 123.234855],
+        newPointE5: [13.630890, 123.234355],
+        newPointE6: [13.631090, 123.234000],
+        newPointE7: [13.631130, 123.233700],
+        newPointE8: [13.631100, 123.232820],
+        newPointE9: [13.631120, 123.232350],
+        newPointF: [13.630070,123.237737],
+        newPointG: [13.630379,123.237800],
+        newPointH: [13.630769,123.237870],
+        newPointH1: [13.630619,123.237870],
+        newPointI: [13.630730,123.238300],
+newPointJ: [13.630580,123.238280],
+newPointK: [13.629950,123.238768],
+newPointL: [13.631040, 123.239980],
+newPointM: [13.631440, 123.239961],
+newPointN: [13.632980, 123.239842],
+        newPointO: [13.631500, 123.239010],
+        newPointO1: [13.631100, 123.239010],
+        newPointP: [13.628787, 123.238600],
+        newPointQ: [13.629130, 123.238180],
+        newPointR: [13.629150, 123.237935],
+        newPointS: [13.628400, 123.238530],
+        newPointT: [13.628480, 123.238100],
+        newPointU: [13.628100, 123.238050],
+        newPointV: [13.628970, 123.239440],
+        newPointW: [13.6286590, 123.239320],
+        newPointW1: [13.6287900, 123.239390],
+        newPointX: [13.628440, 123.240550],
+        newPointY: [13.628150, 123.240400],
+        newPointZ: [13.628250, 123.239600],
+        newPointZ1: [13.628590, 123.239550],
+        newPointZ2: [13.628420, 123.239630],
+        newPointAA: [13.628080, 123.239050],
+        newPointAA2: [13.628180, 123.239150],
+        newPointAA1: [13.628150, 123.238700],
+        newPointAB: [13.627800, 123.239030],
+        newPointAB1: [13.627830, 123.238450],
+        newPointAB2: [13.627800, 123.239450],
+        newPointAC: [13.628200, 123.239950],
+        newPointAD: [13.627770, 123.239810],
+        newPointAE: [13.628722, 123.240615],
+newPointAF: [13.629940, 123.229870],
+        newPointAG: [13.631450, 123.230020],
+        newPointAH: [13.631310, 123.231050],
+newPointAI: [13.631930, 123.232070],
+newPointAJ: [13.631470, 123.231690],
+        newPointAK: [13.631220, 123.231650],
+newPointAL: [13.631970, 123.231740],
+newPointAL1: [13.631930, 123.231740],
+newPointAM: [13.632390, 123.231780],
+newPointAM1: [13.632160, 123.231760],
+newPointAN: [13.632070, 123.230730],
+newPointAO: [13.632300, 123.230750],
+newPointAP: [13.632530, 123.230770],
+newPointAQ: [13.632750, 123.230790],
+newPointAR: [13.632970, 123.230820],
+newPointAR1: [13.633140, 123.230820],
+newPointAS: [13.631650, 123.230680],
+newPointAS1: [13.631370, 123.230630],
+newPointAT: [13.631870, 123.230720],
+newPointAU: [13.632220, 123.231200],
+newPointAV: [13.632460, 123.231250],
+newPointAW: [13.632660, 123.231280],
+newPointAX: [13.632900, 123.231300],
+newPointAY: [13.632680, 123.231450],
+newPointAZ: [13.632020, 123.231150],
+newPointAZ1: [13.632020, 123.231190],
+newPointBA: [13.631790, 123.231120],
+newPointBB: [13.631590, 123.231090],
+newPointBC: [13.631700, 123.231720],
+newPointBD: [13.631790, 123.229710],
+newPointBE: [13.631540, 123.229680],
+newPointBF: [13.632000, 123.229750],
+newPointBG: [13.632230, 123.229795],
+newPointBH: [13.632440, 123.229790],
+newPointBI: [13.6326550, 123.229800],
+newPointBJ: [13.632760, 123.229810],
+newPointBK: [13.632900, 123.229850],
+newPointBL: [13.633430, 123.229900],
+newPointBM: [13.633580, 123.229935],
+        newPointBN: [13.634330, 123.230020],
+        newPointBN1: [13.634080, 123.230000],
+newPointBO: [13.634080, 123.229580],
+newPointBP: [13.633150, 123.230640],
+newPointBQ: [13.632820, 123.230610],
+newPointBR: [13.632850, 123.230400],
+newPointBS: [13.632880, 123.230225],
+newPointBT: [13.632900, 123.230040],
+newPointBU: [13.633350, 123.230460],
+newPointBV: [13.633410, 123.230280],
+newPointBW: [13.633450, 123.230100],
+newPointBX: [13.633580, 123.230090],
+newPointBY: [13.633430, 123.229680],
+newPointBZ: [13.632760, 123.229600],
+newPointCA: [13.632780, 123.229370],
+newPointCB: [13.632800, 123.229150],
+newPointCC: [13.632800, 123.228930],
+newPointCC1: [13.632990, 123.228940],
+newPointCD: [13.632860, 123.228530],
+newPointCE: [13.633300, 123.229430],
+newPointCF: [13.633250, 123.229170],
+newPointCG: [13.633000, 123.228650],
+newPointCH: [13.632340, 123.228995],
+newPointCI: [13.632150, 123.228880],
+newPointCJ: [13.631890, 123.228860],
+newPointCK: [13.631640, 123.228800],
+newPointCL: [13.631950, 123.228600],
+newPointCM: [13.632170, 123.228640],
+newPointCN: [13.631690, 123.228580],
+newPointCO: [13.632070, 123.227730],
+newPointCP: [13.632300, 123.227780],
+newPointCQ: [13.632500, 123.227800],
+newPointCR: [13.632430, 123.228150],
+newPointCS: [13.632250, 123.228150],
+newPointCT: [13.631780, 123.227680],
+newPointCU: [13.629600, 123.229050],
+newPointCV: [13.630250, 123.228620],
+newPointCW: [13.630350, 123.229120],
+newPointCX: [13.631570, 123.229280],
+
+newPointCY: [13.631950, 123.226700],
+    newPointCZ: [13.631450, 123.226470],
+    newPointCZ1: [13.631490, 123.226650],
+    newPointDa: [13.63212, 123.22579],
+    newPointDb: [13.63130, 123.22558],
+    newPointDc: [13.63160, 123.22586],
+    newPointDc1: [13.63160, 123.22566],
+    newPointDe: [13.63275, 123.22527],
+    newPointDe1: [13.63287, 123.22527],
+    newPointDe2: [13.63319, 123.22537],
+    newPointDf: [13.63271, 123.22618],
+    newPointDg: [13.63316, 123.22629],
+    newPointDh: [13.63269, 123.22640],
+    newPointDi: [13.63268, 123.22658],
+    newPointDj: [13.63299, 123.22668],
+    newPointDk: [13.63310, 123.22651],
+    newPointDl: [13.63331, 123.22550],
+    newPointDn: [13.63301, 123.224722],
+    newPointDp: [13.63320, 123.22402],
+    newPointDq: [13.63220, 123.22447],
+    newPointDr: [13.63199, 123.22441],
+    newPointDs: [13.63190, 123.22510],
+    newPointDt: [13.63164, 123.22507],
+    newPointDu: [13.63175, 123.22437],
+    newPointDv: [13.63181, 123.22386],
+    newPointDw: [13.63207, 123.22388],
+    newPointDx: [13.63137, 123.22502],
+    newPointDy: [13.63110, 123.22500],
+    newPointDz: [13.63112, 123.22484],
+    newPointEa: [13.63107, 123.22512],
+    newPointEa1: [13.63100, 123.22512],
+    newPointEb: [13.63147, 123.22433],
+    newPointEc: [13.63124, 123.224285],
+    newPointEd: [13.63118, 123.22456],
+    newPointEe: [13.63133, 123.223823],
+    newPointEf: [13.63148, 123.22403],
+    newPointEg: [13.63116, 123.22427],
+    newPointEg1: [13.63120, 123.22405],
+    newPointEg2: [13.63125, 123.22400],
+    newPointEh: [13.63072, 123.22423],
+    newPointEh1: [13.63065, 123.22412],
+    newPointEi: [13.62995, 123.22393],
+    newPointEj: [13.62992, 123.22370],
+    newPointEj1: [13.62984, 123.22345],
+    newPointEk: [13.62903, 123.22303],
+    newPointEl: [13.62977, 123.22421],
+    newPointEm: [13.62958, 123.22448],
+    newPointEn: [13.62936, 123.22475],
+    newPointEn1: [13.62939, 123.22485],
+    newPointEo: [13.62958, 123.22509],
+    newPointEp: [13.62975, 123.22538],
+    newPointEr: [13.63003, 123.22629],
+    newPointEs: [13.63019, 123.22629],
+    newPointEt: [13.63008, 123.22539],
+    newPointEu: [13.63053, 123.22537],
+    newPointEv: [13.63052, 123.22612],
+    newPointEv1: [13.63055, 123.22582],
+    newPointEw: [13.63091, 123.22539],
+    newPointEy: [13.63323, 123.22264],
+    newPointFa: [13.63292, 123.22164],
+    newPointFe: [13.63399, 123.22045],
+    newPointFh: [13.63563, 123.22235],
+    newPointFk: [13.632010, 123.229450],
+    newPointFl: [13.632500, 123.229800],
+    newPointFm: [13.633000, 123.230100],
+    newPointFn: [13.633500, 123.230400],
+            
+          };
+          
           const map = L.map('map', {
-            center: [${initialRegion.latitude}, ${initialRegion.longitude}],
-            zoom: 16,  // Increased zoom to better see street details
+            center: nodeCoordinates.defaultStartNode,
+            zoom: 15,
             zoomControl: true
           });
-          
-          // Standard OpenStreetMap tiles
+
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
             maxZoom: 19,
           }).addTo(map);
+
+          // Add markers with tooltips for each node
+          for (const [nodeName, coords] of Object.entries(nodeCoordinates)) {
+            L.circleMarker(coords, {
+              radius: 5,
+              color: '#3388ff',
+              fillColor: '#3388ff',
+              fillOpacity: 0.8
+            })
+            .bindTooltip(nodeName, {
+              permanent: false,
+              direction: 'top'
+            })
+            .addTo(map);
+          }
+
+          // Connections between nodes
+          const connections = {
+             defaultStartNode: ['pointA','newPointD'],
+        pointA: ['defaultStartNode', 'pointB','newPointAE'],
+        pointB: ['pointA', 'pointC', 'pointN', 'pointM'],
+        pointC: ['pointB', 'pointD', 'pointK'],
+        pointD: ['pointC', 'pointE'],
+        pointE: ['pointD', 'pointF', 'pointK'],
+        pointF: ['pointE', 'pointG', 'pointH'],
+        pointG: ['pointF'],
+        pointH: ['pointF', 'pointK', 'pointL'],
+        pointK: ['pointH', 'pointE', 'pointC'],
+        pointL: ['pointH', 'pointM', 'pointP'],
+        pointM: ['pointL', 'pointO', 'pointB'],
+        pointN: ['pointB', 'pointO', 'newPointD', 'newPointK'],
+        newPointK: ['newPointF', 'newPointC', 'pointN', 'pointQ'],
+        pointO: ['pointN', 'pointP', 'pointQ', 'pointM'],
+        pointP: ['pointO', 'pointL', 'pointT', 'newPointL'],
+        newPointL: ['newPointO1', 'newPointM','pointP'],
+        newPointO1: ['newPointL', 'newPointO'],
+        newPointO: ['newPointO1', 'newPointM'],
+        newPointM: ['newPointO', 'newPointL', 'newPointN'],
+        newPointN: ['newPointM'],
+        pointQ: ['pointO', 'pointR','newPointK', 'newPointG'],
+        newPointG: ['newPointH1', 'newPointF', 'pointQ'],
+        newPointF: ['newPointG', 'newPointE', 'newPointK'],
+        newPointE: ['newPointF', 'newPointR', 'newPointE1'],
+        newPointE1: ['newPointE', 'newPointE2'],
+        newPointE2: ['newPointE1', 'newPointE3'],
+        newPointE3: ['newPointE2', 'newPointE4'],
+        newPointE4: ['newPointE3', 'newPointE5'],
+        newPointE5: ['newPointE4', 'newPointE6'],
+        newPointE6: ['newPointE5', 'newPointE7'],
+        newPointE7: ['newPointE6', 'newPointE8'],
+        newPointE8: ['newPointE7', 'newPointE9'],
+        newPointE9: ['newPointE8', 'newPointAK'],
+        newPointR: ['newPointE', 'newPointQ', ],
+        newPointQ: ['newPointR', 'newPointC', 'newPointT'],
+        newPointC: ['newPointQ', 'newPointQ', 'newPointP', 'newPointV'],
+        newPointV: ['newPointC', 'newPointD', 'newPointW1'],
+        newPointW: ['newPointW1', 'newPointP', 'newPointAA2',],
+        newPointH1: ['newPointG', 'newPointH', 'newPointJ'],
+        newPointJ: ['newPointH1', 'newPointI','pointR'],
+        newPointH: ['newPointI', 'newPointH1'],
+        newPointI: ['newPointH', 'newPointJ', 'pointS'],
+        pointR: ['pointQ', 'pointT', 'newPointJ'],
+        pointS: ['pointU', 'pointT', 'newPointI'],
+        pointT: ['pointS', 'pointR', 'pointP'],
+        pointU: ['pointS', 'pointV', 'pointad'],
+        pointV: ['pointU', 'pointW', 'pointac'],
+        pointW: ['pointV', 'pointX', 'pointaa'],
+        pointX: ['pointW', 'pointY'],
+        pointY: ['pointX', 'pointZ'],
+        pointZ: ['pointY', 'pointaa'],
+        pointaa: ['pointZ', 'pointab', 'pointW'],
+        pointab: ['pointaa', 'pointac'],
+        pointac: ['pointab', 'pointad', 'pointV'],
+        pointad: ['pointac', 'pointU'],
+        extPointCtop4: ['extPointCtop3'],
+        extPointCtop3: ['extPointCtop2', 'extPointCtop4'],
+        extPointCtop2: ['extPointCtop1', 'extPointCtop3'],
+        extPointCtop1: ['extPointC', 'extPointCtop2'],
+        extPointC: ['extPointD', 'extPointB', 'extPointCtop1'],
+        extPointB: ['extPointA', 'extPointC'],
+        extPointA: ['extPointB'],
+        extPointD: ['extPointC', 'extPointE', 'extPointDleft1'],
+        extPointDleft1: ['extPointD'],
+        extPointF: ['extPointD', 'extPointG'],
+        extPointG: ['extPointF', 'extPointH'],
+        extPointH: ['extPointG', 'extPointI', 'extPointHtop1'],
+        extPointHtop1: ['extPointH'],
+        extPointI: ['extPointH', 'extPointJ'],
+        extPointJ: ['extPointI', 'extPointK'],
+        extPointK: ['extPointJ', 'extPointL'],
+        extPointL: ['extPointK', 'extPointM'],
+        extPointM: ['extPointL', 'extPointN'],
+        extPointN: ['extPointM', 'extPointO', 'extPointNleft1'],
+        extPointNleft1: ['extPointN', 'extPointNleft2', 'newPointFe'],
+        newPointFe: ['extPointNleft1'],
+        extPointNleft2: ['extPointNleft1', 'extPointS', 'extPointNleft3'],
+        extPointNleft3: ['extPointNleft2', 'extPointNleft4'],
+        extPointNleft4: ['extPointNleft3', 'extPointNleft5'],
+        extPointNleft5: ['extPointNleft4', 'extPointNleft6'],
+        extPointNleft6: ['extPointNleft5', 'extPointNleft8'],
+        extPointNleft7: ['extPointNleft8', 'extPointNleft9'],
+        extPointNleft8: ['extPointNleft7', 'extPointNleft6'],
+        extPointNleft9: ['extPointNleft7', 'extPointNleft10'],
+        extPointNleft10: ['extPointNleft9', 'extPointNleft11'],
+        extPointNleft11: ['extPointNleft10', 'extPointNleft12'],
+        extPointNleft12: ['extPointNleft11', 'extPointNleft13'],
+        extPointNleft13: ['extPointNleft12', 'extPointNleft14'],
+        extPointNleft14: ['extPointNleft13', 'newPointFh'],
+        newPointFh: ['extPointNleft14'],
+
+
+        extPointO: ['extPointN', 'extPointP'],
+        extPointP: ['extPointO', 'extPointQ'],
+        extPointQ: ['extPointP', 'extPointR'],
+        extPointR: ['extPointQ', 'extPointS'],
+        extPointS: ['extPointR', 'extPointT', 'extPointNleft2'],
+        extPointT: ['extPointS', 'extPointU','newPointFa'],
+        newPointFa: ['extPointT'],
+        extPointU: ['extPointT', 'extPointV'],
+        extPointV: ['extPointU', 'extPointW','newPointEy'],
+        newPointEy: ['extPointV'],
+        extPointW: ['extPointV', 'extPointX', 'newPointDp'],
+        newPointDp: ['extPointW'],
+        extPointX: ['extPointW', 'extPointY','newPointDq'],
+        newPointDq: ['extPointX', 'newPointDr'],
+        newPointDr: ['newPointDq', 'newPointDs', 'newPointDw', 'newPointDu'],
+        newPointDw: ['newPointDr', 'newPointDv'],
+        newPointDv: ['newPointDw', 'newPointDu', 'newPointEe'],
+        newPointEe: ['newPointDv'],
+        newPointDu: ['newPointDr', 'newPointDv', 'newPointEb', 'newPointDt'],
+        newPointDs: ['newPointDr', 'newPointDt'],
+        newPointDt: ['newPointDu', 'newPointDs', 'newPointDx'],
+        newPointDx: ['newPointDt', 'newPointEb', 'newPointDy'],
+        newPointDy: ['newPointDx', 'newPointDz', 'newPointEa'],
+        newPointEa: ['newPointDy', 'newPointEa1'],
+        newPointEa1: ['newPointEa', 'newPointEw', 'newPointEo'],
+        newPointEw: ['newPointEa1', 'newPointEu'],
+        newPointEu: ['newPointEw', 'newPointEv1', 'newPointEt'],
+        newPointEv1: ['newPointEu', 'newPointEv'],
+        newPointEv: ['newPointEv1'],
+        newPointEt: ['newPointEu', 'newPointEp', 'newPointEs'],
+        newPointEs: ['newPointEt', 'newPointEr'],
+        newPointEr: ['newPointEs', 'newPointEp'],
+        newPointEp: ['newPointEt', 'newPointEo', 'newPointEr'],
+        newPointEo: ['newPointEp', 'newPointEa1', 'newPointEn1'],
+        newPointEn1: ['newPointEo', 'newPointEn'],
+        newPointEn: ['newPointEn1', 'newPointDz', 'newPointEm'],
+        newPointDz: ['newPointEn', 'newPointDy', 'newPointEd'],
+        newPointEd: ['newPointDz', 'newPointEc', 'newPointEm'],
+        newPointEm: ['newPointEd', 'newPointEn', 'newPointEl'],
+        newPointEb: ['newPointDu', 'newPointDx', 'newPointEc'],
+        newPointEc: ['newPointEb', 'newPointEd', 'newPointEg'],
+        newPointEg: ['newPointEc', 'newPointEg1','newPointEh'],
+        newPointEg1: ['newPointEg', 'newPointEg2'],
+        newPointEg2: ['newPointEg1', 'newPointEf'],
+        newPointEf: ['newPointEg2'],
+        newPointEh: ['newPointEg', 'newPointEh1', 'newPointEl'],
+        newPointEh1: ['newPointEh', 'newPointEi'],
+        newPointEi: ['newPointEh1', 'newPointEj', 'newPointEl'],
+        newPointEj: ['newPointEi', 'newPointEj1'],
+        newPointEj1: ['newPointEj', 'newPointEk'],
+        newPointEk: ['newPointEj1'],
+        newPointEl: ['newPointEh', 'newPointEi', 'newPointEm'],
+
+        extPointY: ['extPointX', 'extPointaa', 'newPointDn'],
+        newPointDn: ['extPointY'],
+        extPointaa: ['extPointY', 'newPointDa', 'newPointDe'],
+        newPointD: ['defaultStartNode', 'pointN', 'newPointV'],
+        newPointAE: ['pointA'],
+        newPointT: ['newPointQ', 'newPointU', 'newPointS'],
+        newPointU: ['newPointT', 'newPointAB1'],
+        newPointAB: ['newPointAB2', 'newPointAA', 'newPointAB1'],
+        newPointAA: ['newPointAB', 'newPointAA2', 'newPointAA1'],
+        newPointZ: ['newPointAB2', 'newPointZ2', 'newPointAC'],
+        newPointAC: ['newPointZ', 'newPointAD','newPointY'],
+        newPointAD: ['newPointAC'],
+        newPointY: ['newPointAC', 'newPointX'],
+        newPointX: ['newPointY', 'newPointAE'],
+        newPointAE: ['newPointX', 'pointA'],
+        newPointZ1: ['newPointW1', 'newPointZ2', 'newPointX'],
+        newPointZ2: ['newPointZ1', 'newPointZ'],
+        newPointW1: ['newPointZ1', 'newPointW', 'newPointV'],
+        newPointAB2: ['newPointZ', 'newPointAB'],
+        newPointAB1: ['newPointAB', 'newPointU'],
+        newPointAA2: ['newPointAA', 'newPointW'],
+        newPointAA1: ['newPointAA', 'newPointS'],
+        newPointS: ['newPointAA1', 'newPointT', 'newPointP'],
+        newPointP: ['newPointS', 'newPointC', 'newPointW'],
+        newPointAK: ['newPointAJ', 'newPointAH', 'newPointE9'],
+        newPointAJ: ['newPointAK', 'newPointBC', 'newPointBB'],
+        newPointBC: ['newPointAJ', 'newPointBA', 'newPointAL1'],
+        newPointAL1: ['newPointBC', 'newPointAL', 'newPointAZ1'],
+        newPointAL: ['newPointAL1', 'newPointAI', 'newPointAM1'],
+        newPointAI: ['newPointAL'],
+        newPointAM1: ['newPointAL', 'newPointAM', 'newPointAU'],
+        newPointAM: ['newPointAM1', 'newPointAV'],
+        newPointAH: ['newPointAK', 'newPointBB', 'newPointAS1'],
+        newPointBB: ['newPointAH', 'newPointAJ', 'newPointBA', 'newPointAS'],
+        newPointBA: ['newPointBB', 'newPointAT', 'newPointAZ', 'newPointBC'],
+        newPointAZ: ['newPointBA', 'newPointAZ1', 'newPointAN'],
+        newPointAZ1: ['newPointAZ', 'newPointAL1', 'newPointAU'],
+        newPointAU: ['newPointAZ1', 'newPointAM1', 'newPointAV', 'newPointAO'],
+        newPointAV: ['newPointAU', 'newPointAP', 'newPointAM', 'newPointAW'],
+        newPointAW: ['newPointAV', 'newPointAY', 'newPointAX', 'newPointAQ'],
+        newPointAX: ['newPointAW', 'newPointAR'],
+        newPointAY: ['newPointAW'],
+        newPointAS1: ['newPointAH', 'newPointAS', 'newPointAG'],
+        newPointAS: ['newPointAS1', 'newPointAT', 'newPointBB', 'newPointBD'],
+        newPointAT: ['newPointAS', 'newPointAN', 'newPointBA'],
+        newPointAN: ['newPointAT', 'newPointAZ', 'newPointAO', 'newPointBG'],
+        newPointAO: ['newPointAN', 'newPointBH', 'newPointAU', 'newPointAP'],
+        newPointAP: ['newPointAO', 'newPointAV', 'newPointAQ', 'newPointBI'],
+        newPointAQ: ['newPointAP', 'newPointAW', 'newPointAR', 'newPointBQ'],
+        newPointAR: ['newPointAQ', 'newPointAX', 'newPointAR1'],
+        newPointAR1: ['newPointAR'],
+        newPointBQ: ['newPointBP', 'newPointBR', 'newPointAQ'],
+        newPointBP: ['newPointBQ'],
+        newPointBR: ['newPointBQ', 'newPointBS', 'newPointBU'],
+        newPointBU: ['newPointBR'],
+        newPointBS: ['newPointBR', 'newPointBT', 'newPointBV'],
+        newPointBV: ['newPointBS', 'newPointBW'],
+        newPointBT: ['newPointBS', 'newPointBK', 'newPointBW'],
+        newPointBW: ['newPointBT', 'newPointBX', 'newPointBV'],
+        newPointBX: ['newPointBW', 'newPointBM'],
+        newPointBM: ['newPointBX', 'newPointBL', 'newPointBN1'],
+        newPointBN1: ['newPointBM', 'newPointBN', 'newPointBO'],
+        newPointBN: ['newPointBN1'],
+        newPointBO: ['newPointBN1'],
+        newPointBL: ['newPointBM', 'newPointBY', 'newPointBK'],
+        newPointBK: ['newPointBL', 'newPointBT', 'newPointBJ'],
+        newPointBJ: ['newPointBK', 'newPointBI', 'newPointBZ'],
+        newPointBI: ['newPointBJ', 'newPointBH', 'newPointAP'],
+        newPointBH: ['newPointBI', 'newPointAO', 'newPointBG'],
+        newPointBG: ['newPointBH', 'newPointAN', 'newPointBF', 'newPointCH'],
+        newPointCH: ['newPointBG'],
+        newPointBF: ['newPointBG', 'newPointCI', 'newPointBD'],
+        newPointBD: ['newPointBF', 'newPointCJ', 'newPointBE', 'newPointAS'],
+        newPointBE: ['newPointAG', 'newPointBD', 'newPointCX'],
+        newPointAG: ['newPointAS1', 'newPointBE', 'newPointAF'],
+        newPointAF: ['newPointAG'],
+        newPointCX: ['newPointBE', 'newPointCK','newPointCW'],
+        newPointCW: ['newPointCX', 'newPointCV', 'newPointCU'],
+        newPointCV: ['newPointCW'],
+        newPointCU: ['newPointCW'],
+        newPointCK: ['newPointCX', 'newPointCN', 'newPointCJ'],
+        newPointCJ: ['newPointCK', 'newPointCI', 'newPointBD'],
+        newPointCI: ['newPointCJ', 'newPointBF', 'newPointCM'],
+        newPointCM: ['newPointCI', 'newPointCS', 'newPointCL'],
+        newPointCL: ['newPointCM', 'newPointCN', 'newPointCO'],
+        newPointCN: ['newPointCL', 'newPointCK', 'newPointCT'],
+        newPointCT: ['newPointCN', 'newPointCO', 'newPointCY'],
+        newPointCO: ['newPointCP', 'newPointCL', 'newPointCT'],
+        newPointCP: ['newPointCO', 'newPointCQ', 'newPointCS'],
+        newPointCQ: ['newPointCP', 'newPointCR'],
+        newPointCR: ['newPointCQ', 'newPointCS'],
+        newPointCS: ['newPointCR', 'newPointCP', 'newPointCM'],
+        newPointBY: ['newPointBL', 'newPointBZ'],
+        newPointBZ: ['newPointBY', 'newPointBJ', 'newPointCA'],
+        newPointCA: ['newPointBZ', 'newPointCB', 'newPointCE'],
+        newPointCE: ['newPointCA'],
+        newPointCB: ['newPointCA', 'newPointCC', 'newPointCF'],
+        newPointCF: ['newPointCB'],
+        newPointCC: ['newPointCB', 'newPointCD', 'newPointCC1'],
+        newPointCC1: ['newPointCC', 'newPointCG'],
+        newPointCG: ['newPointCC1'],
+        newPointCD: ['newPointCC'],
+        newPointCY: ['newPointCT', 'newPointCZ1', 'newPointDa'],
+        newPointCZ1: ['newPointCY', 'newPointCZ'],
+        newPointCZ: ['newPointCZ1'],
+        newPointDa: ['newPointCY', 'extPointaa', 'newPointDc1'],
+        newPointDc1: ['newPointDa', 'newPointDb', 'newPointDc'],
+        newPointDb: ['newPointDc1'],
+        newPointDc: ['newPointDc1'],
+        newPointDe: ['extPointaa', 'newPointDf', 'newPointDe1'],
+        newPointDe1: ['newPointDe', 'newPointDe2'],
+        newPointDe2: ['newPointDe1', 'newPointDl'],
+        newPointDl: ['newPointDe2'],
+        newPointDf: ['newPointDe', 'newPointDg', 'newPointDh'],
+        newPointDg: ['newPointDf'],
+        newPointDh: ['newPointDf', 'newPointDi','newPointDk'],
+        newPointDk: ['newPointDh'],
+        newPointDi: ['newPointDh', 'newPointDj'],
+        newPointDj: ['newPointDi'],
+
+          };
+
+          // Haversine formula for distances
+          function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) ** 2 +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          }
+
+          // Build weighted graph
+          const graph = {};
+          for (const [node, neighbors] of Object.entries(connections)) {
+            graph[node] = {};
+            for (const neighbor of neighbors) {
+              graph[node][neighbor] = getDistance(...nodeCoordinates[node], ...nodeCoordinates[neighbor]);
+            }
+          }
+
+          // Dijkstra algorithm
+          function dijkstra(graph, start, end) {
+            const distances = {};
+            const previous = {};
+            const visited = new Set();
+            const nodes = new Set(Object.keys(graph));
+
+            for (const node of nodes) {
+              distances[node] = Infinity;
+              previous[node] = null;
+            }
+            distances[start] = 0;
+
+            while (nodes.size) {
+              const current = [...nodes].reduce((a, b) => distances[a] < distances[b] ? a : b);
+              if (current === end) break;
+              nodes.delete(current);
+              visited.add(current);
+
+              for (const neighbor in graph[current]) {
+                if (!visited.has(neighbor)) {
+                  const newDist = distances[current] + graph[current][neighbor];
+                  if (newDist < distances[neighbor]) {
+                    distances[neighbor] = newDist;
+                    previous[neighbor] = current;
+                  }
+                }
+              }
+            }
+
+            const path = [];
+            let curr = end;
+            while (curr) {
+              path.unshift(curr);
+              curr = previous[curr];
+            }
+
+            return { path, distance: distances[end] };
+          }
+
+          // Draw polyline for route
+          let currentRouteLine = null;
+          function drawRoute(path) {
+            if (currentRouteLine) {
+              map.removeLayer(currentRouteLine);
+            }
+            const latlngs = path.map(name => nodeCoordinates[name]);
+            currentRouteLine = L.polyline(latlngs, { color: 'blue', weight: 5 }).addTo(map);
+            
+            // Fit map to show the entire route
+            if (latlngs.length > 0) {
+              map.fitBounds(L.latLngBounds(latlngs), { padding: [30, 30] });
+            }
+          }
+
+          // Draw lines between connected nodes
+          for (const [node, neighbors] of Object.entries(connections)) {
+            for (const neighbor of neighbors) {
+              const latlngs = [nodeCoordinates[node], nodeCoordinates[neighbor]];
+              L.polyline(latlngs, { color: 'gray', weight: 2, dashArray: '4' }).addTo(map);
+            }
+          }
           
-          // Alternative map styles (uncomment one of these to use instead)
+          // Add clickable markers
+          for (const [name, coords] of Object.entries(nodeCoordinates)) {
+            const label = name === 'defaultStartNode' ? 'default starting node' : name;
+            const marker = L.circleMarker(coords, {
+              radius: 5,
+              color: 'red',
+              fillColor: 'red',
+              fillOpacity: 0.8
+            }).addTo(map).bindPopup(label);
+
+            marker.on('click', () => {
+              if (name === 'defaultStartNode') return;
+              const result = dijkstra(graph, 'defaultStartNode', name);
+              console.log("Route to", name, result);
+              drawRoute(result.path);
+              
+              // Send message to React Native if not on web
+              if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                  type: 'ROUTE_SELECTED',
+                  destination: name,
+                  distance: result.distance,
+                  path: result.path
+                }));
+              }
+            });
+          }
           
-          // Topographic style
-          // const topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-          //   attribution: '© OpenStreetMap contributors, © OpenTopoMap',
-          //   maxZoom: 17
-          // });
-          
-          // Light/minimal style
-          // const lightLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-          //   attribution: '© OpenStreetMap contributors, © CARTO',
-          //   maxZoom: 19
-          // });
-          
-          // Dark style
-          // const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-          //   attribution: '© OpenStreetMap contributors, © CARTO',
-          //   maxZoom: 19
-          // });
-          
-          // To switch between layers, you could create a layer control
-          // Example: 
-          // const baseLayers = {
-          //   "Standard": baseLayer,
-          //   "Topographic": topoLayer,
-          //   "Light": lightLayer,
-          //   "Dark": darkLayer
-          // };
-          // L.control.layers(baseLayers).addTo(map);
-          
-          // Add markers
+          // Add incident markers
           ${generateMapMarkers()}
           
-          // Ensure map is properly displayed by triggering a resize after a short delay
-          setTimeout(function() {
-            map.invalidateSize();
-          }, 100);
+          setTimeout(() => map.invalidateSize(), 100);
+          map.attributionControl.setPrefix('');
+          L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
           
-          // Improve map usability
-          map.attributionControl.setPrefix(''); // Remove Leaflet attribution prefix
-          
-          // Add scale control at bottom left
-          L.control.scale({
-            imperial: false,  // Set to true if you want both metric and imperial
-            position: 'bottomleft'
-          }).addTo(map);
+          // Make functions available globally for calling from React Native
+          window.dijkstra = dijkstra;
+          window.drawRoute = drawRoute;
+          window.nodeCoordinates = nodeCoordinates;
+          window.graph = graph;
         });
       </script>
     </body>
     </html>`;
+
+  const handleIncidentPress = (incident) => {
+    if (incident.latitude && incident.longitude) {
+      // For simplicity, we'll just display information about the incident
+      // In a full implementation, you'd want to find the nearest node and calculate a route
+      setSelectedDestination(`Incident at ${incident.latitude.toFixed(4)}, ${incident.longitude.toFixed(4)}`);
+    }
+  };
+
+  const renderIncidentList = () => {
+    if (loading) {
+      return <ActivityIndicator size="large" color="#007AFF" />;
+    }
+    
+    if (incidents.length === 0) {
+      return <Text style={styles.subText}>No incidents found. Please check back later.</Text>;
+    }
+    
+    return incidents.map((incident, index) => (
+      <TouchableOpacity 
+        key={incident._id || index} 
+        style={styles.listItem}
+        onPress={() => handleIncidentPress(incident)}
+      >
+        <Text style={styles.listItemText}>🚨 Incident #{index + 1}</Text>
+        <Text style={styles.subText}>🧑 Admin: {incident.username || 'Unknown'}</Text>
+        <Text style={styles.subText}>
+          📍 Location: Lat {incident.latitude?.toFixed(4) || 'N/A'}, Lng {incident.longitude?.toFixed(4) || 'N/A'}
+        </Text>
+      </TouchableOpacity>
+    ));
+  };
 
   return (
     <View style={styles.container}>
@@ -344,21 +867,7 @@ const NavigationScreen = () => {
           </TouchableOpacity>
         </View>
         <ScrollView style={styles.listContainer}>
-          {loading ? (
-            <ActivityIndicator size="large" color="#007AFF" />
-          ) : incidents.length === 0 ? (
-            <Text style={styles.subText}>No incidents found. Please check back later.</Text>
-          ) : (
-            incidents.map((incident, index) => (
-              <View key={incident._id || index} style={styles.listItem}>
-                <Text style={styles.listItemText}>🚨 Incident #{index + 1}</Text>
-                <Text style={styles.subText}>🧑 Admin: {incident.username || 'Unknown'}</Text>
-                <Text style={styles.subText}>
-                  📍 Location: Lat {incident.latitude?.toFixed(4) || 'N/A'}, Lng {incident.longitude?.toFixed(4) || 'N/A'}
-                </Text>
-              </View>
-            ))
-          )}
+          {renderIncidentList()}
         </ScrollView>
       </View>
 
@@ -380,13 +889,25 @@ const NavigationScreen = () => {
               startInLoadingState={true}
               renderLoading={() => <ActivityIndicator size="large" color="#007AFF" style={styles.mapLoading} />}
               onError={(e) => console.error('WebView error:', e.nativeEvent)}
+              onMessage={(event) => {
+                try {
+                  const data = JSON.parse(event.nativeEvent.data);
+                  if (data.type === 'ROUTE_SELECTED') {
+                    setSelectedDestination(`${data.destination} (${data.distance.toFixed(3)} km)`);
+                  }
+                } catch (e) {
+                  console.error('Error parsing WebView message:', e);
+                }
+              }}
             />
           )}
         </View>
 
         <View style={styles.bottomContainer}>
-          <Text style={styles.bottomText}>🆔 Incident Details</Text>
-          <Text style={styles.subText}>Location: Zone 4</Text>
+          <Text style={styles.bottomText}>🆔 {selectedDestination ? 'Route Information' : 'Incident Details'}</Text>
+          <Text style={styles.subText}>
+            {selectedDestination ? `Destination: ${selectedDestination}` : 'Location: Zone 4'}
+          </Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button}>
               <Text style={styles.buttonText}>📩 Message</Text>
