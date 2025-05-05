@@ -10,6 +10,10 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
+import NavigationOutlinedIcon from '@mui/icons-material/NavigationOutlined';
+import { Icon } from 'react-native-elements';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -393,7 +397,7 @@ newPointCY: [13.631950, 123.226700],
     newPointFl: [13.632500, 123.229800],
     newPointFm: [13.633000, 123.230100],
     newPointFn: [13.633500, 123.230400],
-            
+            // You can add more points from your data here
           };
           
           const map = L.map('map', {
@@ -424,7 +428,7 @@ newPointCY: [13.631950, 123.226700],
 
           // Connections between nodes
           const connections = {
-             defaultStartNode: ['pointA','newPointD'],
+            defaultStartNode: ['pointA','newPointD'],
         pointA: ['defaultStartNode', 'pointB','newPointAE'],
         pointB: ['pointA', 'pointC', 'pointN', 'pointM'],
         pointC: ['pointB', 'pointD', 'pointK'],
@@ -570,6 +574,9 @@ newPointCY: [13.631950, 123.226700],
         newPointEk: ['newPointEj1'],
         newPointEl: ['newPointEh', 'newPointEi', 'newPointEm'],
 
+
+
+
         extPointY: ['extPointX', 'extPointaa', 'newPointDn'],
         newPointDn: ['extPointY'],
         extPointaa: ['extPointY', 'newPointDa', 'newPointDe'],
@@ -689,7 +696,6 @@ newPointCY: [13.631950, 123.226700],
         newPointDk: ['newPointDh'],
         newPointDi: ['newPointDh', 'newPointDj'],
         newPointDj: ['newPointDi'],
-
           };
 
           // Haversine formula for distances
@@ -843,11 +849,41 @@ newPointCY: [13.631950, 123.226700],
         style={styles.listItem}
         onPress={() => handleIncidentPress(incident)}
       >
-        <Text style={styles.listItemText}>🚨 Incident #{index + 1}</Text>
-        <Text style={styles.subText}>🧑 Admin: {incident.username || 'Unknown'}</Text>
-        <Text style={styles.subText}>
-          📍 Location: Lat {incident.latitude?.toFixed(4) || 'N/A'}, Lng {incident.longitude?.toFixed(4) || 'N/A'}
-        </Text>
+        <View style={styles.incidentHeader}>
+          <View style={styles.incidentIcon}>
+          <Icon name="add-alert" size={30} color="#f44336" />
+          </View>
+          <Text style={styles.listItemText}>Incident #{index + 1}</Text>
+        </View>
+        
+        <View style={styles.incidentDetail}>
+          <View style={styles.iconContainer}>
+            <View style={styles.detailIcon}>
+            <MaterialIcon name="person-pin" size={30} color="#393E46" />
+            </View>
+          </View>
+          <Text style={styles.detailText}>{incident.username || 'Unknown'}</Text>
+        </View>
+        
+        <View style={styles.incidentDetail}>
+          <View style={styles.iconContainer}>
+            <View style={styles.detailIcon}>
+            <MaterialIcon name="room" size={30} color="#e91e63" />
+            </View>
+          </View>
+          <Text style={styles.detailText}>
+            Lat {incident.latitude?.toFixed(4) || 'N/A'}, Lng {incident.longitude?.toFixed(4) || 'N/A'}
+          </Text>
+        </View>
+        
+        <View style={styles.incidentActions}>
+          <TouchableOpacity style={styles.miniAction}>
+            <Text style={styles.miniActionText}>Details</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.miniAction}>
+            <Text style={styles.miniActionText}>Navigate</Text>
+          </TouchableOpacity>
+        </View>
       </TouchableOpacity>
     ));
   };
@@ -855,17 +891,34 @@ newPointCY: [13.631950, 123.226700],
   return (
     <View style={styles.container}>
       <View style={styles.leftContainer}>
-        <Text style={styles.title}>Navigation</Text>
+        <View style={styles.titleContainer}>
+          <View style={styles.titleIconContainer}>
+            <NavigationOutlinedIcon style={{ fontSize: 40, color: 'blue' }} />
+          </View>
+          <Text style={styles.title}>Navigation</Text>
+        </View>
+        
         <View style={styles.searchContainer}>
+          <View style={styles.searchIconContainer}>
+            <Text style={styles.searchIcon}>🔍</Text>
+          </View>
           <TextInput
             style={styles.searchInput}
             placeholder="Search location"
             placeholderTextColor="#999"
           />
           <TouchableOpacity style={styles.filterButton}>
-            <Text style={styles.buttonEmoji}>🔍</Text>
+            <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
         </View>
+        
+        <View style={styles.incidentsHeaderContainer}>
+          <View style={styles.incidentsHeaderIcon}>
+          <Icon name="add-alert" size={30} color="#f44336" />
+          </View>
+          <Text style={styles.incidentsHeaderText}>Active Incidents</Text>
+        </View>
+        
         <ScrollView style={styles.listContainer}>
           {renderIncidentList()}
         </ScrollView>
@@ -904,16 +957,40 @@ newPointCY: [13.631950, 123.226700],
         </View>
 
         <View style={styles.bottomContainer}>
-          <Text style={styles.bottomText}>🆔 {selectedDestination ? 'Route Information' : 'Incident Details'}</Text>
-          <Text style={styles.subText}>
-            {selectedDestination ? `Destination: ${selectedDestination}` : 'Location: Zone 4'}
-          </Text>
+          <View style={styles.bottomHeaderContainer}>
+            <View style={styles.bottomHeaderIcon}>
+              <Text style={styles.bottomHeaderIconText}>
+                {selectedDestination ? '🧭' : '🆔'}
+              </Text>
+            </View>
+            <Text style={styles.bottomText}>
+              {selectedDestination ? 'Route Information' : 'Incident Details'}
+            </Text>
+          </View>
+          
+          <View style={styles.infoContainer}>
+            <View style={styles.infoIconContainer}>
+              <View style={styles.infoIcon}>
+                <Text style={styles.infoIconText}>📌</Text>
+              </View>
+            </View>
+            <Text style={styles.infoText}>
+              {selectedDestination ? `Destination: ${selectedDestination}` : 'Location: Zone 4'}
+            </Text>
+          </View>
+          
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>📩 Message</Text>
+              <View style={styles.buttonIconContainer}>
+              <MaterialIcon name="local-post-office" size={30} color="#fff" />
+              </View>
+              <Text style={styles.buttonText}>Message</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>📞 Call</Text>
+            <TouchableOpacity style={[styles.button, styles.callButton]}>
+              <View style={styles.buttonIconContainer}>
+              <MaterialIcon name="call" size={30} color="#FF0000" />
+              </View>
+              <Text style={styles.buttonText}>Call</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -928,6 +1005,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#f0f2f5',
   },
+  // Left container styles
   leftContainer: {
     flex: 1,
     padding: 15,
@@ -935,72 +1013,188 @@ const styles = StyleSheet.create({
     borderRightColor: '#ddd',
     backgroundColor: '#fff',
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  titleIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#007AFF15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  titleIcon: {
+    fontSize: 18,
+  },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
     color: '#333',
   },
   searchContainer: {
     flexDirection: 'row',
-    marginBottom: 15,
+    alignItems: 'center',
+    marginBottom: 20,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  searchIconContainer: {
+    marginRight: 8,
+  },
+  searchIcon: {
+    fontSize: 16,
+    color: '#666',
   },
   searchInput: {
     flex: 1,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#fafafa',
+    fontSize: 14,
+    color: '#333',
   },
   filterButton: {
     marginLeft: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#007AFF',
+    borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    backgroundColor: '#007AFF',
-    borderRadius: 10,
   },
-  buttonEmoji: {
-    fontSize: 18,
+  filterButtonText: {
     color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  incidentsHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  incidentsHeaderIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#FFE8E8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  incidentsHeaderIconText: {
+    fontSize: 14,
+  },
+  incidentsHeaderText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
   },
   listContainer: {
     flex: 1,
   },
+  
+  // Incident item styles
   listItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: '#fdfdfd',
-    borderRadius: 8,
-    marginBottom: 10,
+    padding: 14,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 12,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF3B30',
+  },
+  incidentHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  incidentIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#FFE8E8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  incidentIconText: {
+    fontSize: 14,
   },
   listItemText: {
     fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontWeight: '700',
+    color: '#333',
   },
-  subText: {
+  incidentDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  iconContainer: {
+    width: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  detailIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconText: {
+    fontSize: 12,
+  },
+  detailText: {
     fontSize: 14,
     color: '#555',
+    flex: 1,
+    paddingLeft: 4,
   },
+  incidentActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 8,
+  },
+  miniAction: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  miniActionText: {
+    fontSize: 12,
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  
+  // Right container styles
   rightContainer: {
     flex: 2,
     padding: 15,
   },
   mapContainer: {
     flex: 1.5,
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 15,
     backgroundColor: '#e1e4e8',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 4,
   },
   mapLoading: {
     position: 'absolute',
@@ -1011,37 +1205,108 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
+  // Bottom container styles
   bottomContainer: {
-    padding: 15,
-    borderRadius: 10,
+    padding: 18,
+    borderRadius: 16,
     backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  bottomHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  bottomHeaderIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#007AFF15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  bottomHeaderIconText: {
+    fontSize: 16,
   },
   bottomText: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 5,
     color: '#333',
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  infoIconContainer: {
+    width: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoIcon: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoIconText: {
+    fontSize: 14,
+  },
+  infoText: {
+    fontSize: 15,
+    color: '#555',
+    flex: 1,
+    paddingLeft: 6,
   },
   buttonContainer: {
     flexDirection: 'row',
-    marginTop: 10,
+    justifyContent: 'space-between',
+    marginTop: 6,
   },
   button: {
     flex: 1,
+    flexDirection: 'row',
     backgroundColor: '#007AFF',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#007AFF',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  callButton: {
+    backgroundColor: '#34C759',
+    shadowColor: '#34C759',
+  },
+  buttonIconContainer: {
+    marginRight: 6,
+  },
+  buttonIcon: {
+    fontSize: 16,
   },
   buttonText: {
     color: '#fff',
-    textAlign: 'center',
     fontWeight: '600',
+    fontSize: 15,
+  },
+  subText: {
+    fontSize: 14,
+    color: '#555',
   },
 });
 
