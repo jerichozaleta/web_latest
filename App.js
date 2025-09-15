@@ -1,99 +1,293 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-// Screens
+// Import your screens
 import DashboardScreen from './screens/DashboardScreen';
-import HomeScreen from './screens/HomeScreen';
 import NavigationScreen from './screens/NavigationScreen';
-import PoliceStationScreen from './screens/PoliceStationScreen';
 import MessagesScreen from './screens/MessagesScreen';
-import NotificationScreen from './screens/NotificationScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import LogoutScreen from './screens/LogoutScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-// Key for AsyncStorage
-const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1';
-
-const DrawerNavigator = () => (
-  <Drawer.Navigator
-    initialRouteName="Dashboard" // Ensure this matches your default route
-    screenOptions={{
-      headerShown: true,
-      drawerStyle: {
-        backgroundColor: '#FFB6C1',
-        width: 240,
-      },
-      drawerActiveTintColor: '#000000',
-      drawerInactiveTintColor: '#000000',
-      drawerLabelStyle: {
-        fontSize: 16,
-      },
-    }}
-  >
-    <Drawer.Screen name="Dashboard" component={DashboardScreen} />
-    <Drawer.Screen name="Home" component={HomeScreen} />
-    <Drawer.Screen name="Navigation" component={NavigationScreen} />
-    <Drawer.Screen name="Police Station" component={PoliceStationScreen} />
-    <Drawer.Screen name="Messages" component={MessagesScreen} />
-    <Drawer.Screen name="Notification" component={NotificationScreen} />
-    <Drawer.Screen name="Settings" component={SettingsScreen} />
-    <Drawer.Screen name="Logout" component={LogoutScreen} />
-  </Drawer.Navigator>
-);
-
-export default function App() {
-  const [isReady, setIsReady] = useState(false);
-  const [initialState, setInitialState] = useState();
-
-  useEffect(() => {
-    const restoreState = async () => {
-      try {
-        const savedStateString = await AsyncStorage.getItem(PERSISTENCE_KEY);
-        const state = savedStateString ? JSON.parse(savedStateString) : undefined;
-        setInitialState(state);
-      } catch (e) {
-        console.error('Failed to load navigation state', e);
-      } finally {
-        setIsReady(true);
-      }
-    };
-
-    restoreState();
-  }, []);
-
-  const onStateChange = useCallback(
-    async (state) => {
-      try {
-        await AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state));
-      } catch (e) {
-        console.error('Failed to save navigation state', e);
-      }
-    },
-    []
-  );
-
-  if (!isReady) return null;
+// Custom Drawer Content Component
+const CustomDrawerContent = ({ navigation, state }) => {
+  const menuItems = [
+    { name: 'Dashboard', icon: 'dashboard', route: 'Dashboard' },
+    { name: 'Navigation', icon: 'navigation', route: 'Navigation' },
+    { name: 'Messages', icon: 'message', route: 'Messages' },
+    { name: 'Settings', icon: 'settings', route: 'Settings' },
+    { name: 'Logout', icon: 'logout', route: 'Logout' },
+  ];
 
   return (
-    <NavigationContainer initialState={initialState} onStateChange={onStateChange}>
-      <Stack.Navigator initialRouteName="MainApp">
-        <Stack.Screen
-          name="MainApp"
-          component={DrawerNavigator}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="NavigationScreen" component={NavigationScreen} />
-        <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
-        <Stack.Screen name="PoliceStationScreen" component={PoliceStationScreen} />
-        <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-      </Stack.Navigator>
+    <View style={styles.drawerContainer}>
+      {/* Header */}
+      <View style={styles.drawerHeader}>
+        <View style={styles.logoContainer}>
+          <Icon name="security" size={40} color="#4ECDC4" />
+        </View>
+        <Text style={styles.appTitle}>VAWC Prevention</Text>
+        <Text style={styles.appSubtitle}>Violence Against Women & Children</Text>
+      </View>
+
+      {/* Menu Items */}
+      <View style={styles.menuContainer}>
+        {menuItems.map((item, index) => {
+          const isActive = state.routeNames[state.index] === item.route;
+          
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[styles.menuItem, isActive && styles.activeMenuItem]}
+              onPress={() => navigation.navigate(item.route)}
+            >
+              <View style={[styles.menuIconContainer, isActive && styles.activeMenuIconContainer]}>
+                <Icon 
+                  name={item.icon} 
+                  size={22} 
+                  color={isActive ? '#4ECDC4' : '#666'} 
+                />
+              </View>
+              <Text style={[styles.menuText, isActive && styles.activeMenuText]}>
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      {/* Footer */}
+      <View style={styles.drawerFooter}>
+        <View style={styles.emergencySection}>
+          <TouchableOpacity style={styles.emergencyButton}>
+            <Icon name="emergency" size={20} color="white" />
+            <Text style={styles.emergencyButtonText}>Emergency</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.footerText}>Version 1.2.3</Text>
+      </View>
+    </View>
+  );
+};
+
+// Bottom Tab Navigator Component
+const MainTabNavigator = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          switch (route.name) {
+            case 'Dashboard':
+              iconName = 'dashboard';
+              break;
+            case 'Navigation':
+              iconName = 'navigation';
+              break;
+            case 'Messages':
+              iconName = 'message';
+              break;
+            case 'Settings':
+              iconName = 'settings';
+              break;
+            default:
+              iconName = 'home';
+          }
+
+          return <Icon name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#4ECDC4',
+        tabBarInactiveTintColor: '#666',
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          borderTopColor: '#E1E8ED',
+          borderTopWidth: 1,
+          paddingBottom: 5,
+          paddingTop: 5,
+          height: 60,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
+      })}
+    >
+      <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="Navigation" component={NavigationScreen} />
+      <Tab.Screen name="Messages" component={MessagesScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
+  );
+};
+
+// Stack Navigator for screens that need to be pushed
+const MainStackNavigator = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyle: { backgroundColor: '#F8F9FA' },
+        animationEnabled: true,
+        animationTypeForReplace: 'push',
+      }}
+    >
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="Messages" component={MessagesScreen} />
+      <Stack.Screen name="Logout" component={LogoutScreen} />
+      {/* Add more stack screens as needed */}
+    </Stack.Navigator>
+  );
+};
+
+// Main Drawer Navigator
+const DrawerNavigator = () => {
+  return (
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        headerShown: false,
+        drawerStyle: {
+          backgroundColor: '#FFFFFF',
+          width: 280,
+        },
+        drawerType: 'slide',
+        overlayColor: 'rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      <Drawer.Screen name="Main" component={MainStackNavigator} />
+      <Drawer.Screen name="Dashboard" component={DashboardScreen} />
+      <Drawer.Screen name="Navigation" component={NavigationScreen} />
+      <Drawer.Screen name="Messages" component={MessagesScreen} />
+      <Drawer.Screen name="Settings" component={SettingsScreen} />
+      <Drawer.Screen name="Logout" component={LogoutScreen} />
+    </Drawer.Navigator>
+  );
+};
+
+// Root App Component
+const App = () => {
+  return (
+    <NavigationContainer>
+      <DrawerNavigator />
     </NavigationContainer>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  drawerContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  drawerHeader: {
+    backgroundColor: '#4ECDC4',
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15,
+  },
+  appTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 5,
+  },
+  appSubtitle: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+  },
+  menuContainer: {
+    flex: 1,
+    paddingTop: 20,
+    paddingHorizontal: 10,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    marginBottom: 5,
+  },
+  activeMenuItem: {
+    backgroundColor: '#4ECDC420',
+    borderRightWidth: 3,
+    borderRightColor: '#4ECDC4',
+  },
+  menuIconContainer: {
+    width: 35,
+    alignItems: 'center',
+  },
+  activeMenuIconContainer: {
+    // Additional styling for active icon container if needed
+  },
+  menuText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+    marginLeft: 10,
+  },
+  activeMenuText: {
+    color: '#4ECDC4',
+    fontWeight: '600',
+  },
+  drawerFooter: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+  },
+  emergencySection: {
+    marginBottom: 20,
+  },
+  emergencyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF4757',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    elevation: 3,
+    shadowColor: '#FF4757',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  emergencyButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'center',
+  },
+});
+
+export default App;

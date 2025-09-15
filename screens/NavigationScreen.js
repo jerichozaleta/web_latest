@@ -70,7 +70,7 @@ const NavigationScreen = () => {
 
   const selectDestination = (pointName) => {
     setSelectedDestination(pointName);
-    
+
     if (webViewRef.current && Platform.OS !== 'web') {
       // For React Native WebView
       webViewRef.current.injectJavaScript(`
@@ -127,8 +127,8 @@ const NavigationScreen = () => {
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
       <script>
         document.addEventListener('DOMContentLoaded', function () {
-          const nodeCoordinates = {
-            defaultStartNode: [13.628913, 123.240131],
+      const nodeCoordinates = {
+        defaultStartNode: [13.628913, 123.240131],
         pointA: [13.628832, 123.240675],
         pointB: [13.629782, 123.240870],
         pointC: [13.629755, 123.241241],
@@ -207,7 +207,7 @@ const NavigationScreen = () => {
 
         newPointC: [13.629087, 123.238700],
         newPointD: [13.628950, 123.239650],
-        newPointE: [13.629219,123.237519],
+        newPointE: [13.629219, 123.237519],
         newPointE1: [13.629380, 123.236690],
         newPointE2: [13.629790, 123.235925],
         newPointE3: [13.630170, 123.235395],
@@ -217,16 +217,16 @@ const NavigationScreen = () => {
         newPointE7: [13.631130, 123.233700],
         newPointE8: [13.631100, 123.232820],
         newPointE9: [13.631120, 123.232350],
-        newPointF: [13.630070,123.237737],
-        newPointG: [13.630379,123.237800],
-        newPointH: [13.630769,123.237870],
-        newPointH1: [13.630619,123.237870],
-        newPointI: [13.630730,123.238300],
-newPointJ: [13.630580,123.238280],
-newPointK: [13.629950,123.238768],
-newPointL: [13.631040, 123.239980],
-newPointM: [13.631440, 123.239961],
-newPointN: [13.632980, 123.239842],
+        newPointF: [13.630070, 123.237737],
+        newPointG: [13.630379, 123.237800],
+        newPointH: [13.630769, 123.237870],
+        newPointH1: [13.630619, 123.237870],
+        newPointI: [13.630730, 123.238300],
+        newPointJ: [13.630580, 123.238280],
+        newPointK: [13.629950, 123.238768],
+        newPointL: [13.631040, 123.239980],
+        newPointM: [13.631440, 123.239961],
+        newPointN: [13.632980, 123.239842],
         newPointO: [13.631500, 123.239010],
         newPointO1: [13.631100, 123.239010],
         newPointP: [13.628787, 123.238600],
@@ -252,153 +252,251 @@ newPointN: [13.632980, 123.239842],
         newPointAC: [13.628200, 123.239950],
         newPointAD: [13.627770, 123.239810],
         newPointAE: [13.628722, 123.240615],
-newPointAF: [13.629940, 123.229870],
+        newPointAF: [13.629940, 123.229870],
         newPointAG: [13.631450, 123.230020],
         newPointAH: [13.631310, 123.231050],
-newPointAI: [13.631930, 123.232070],
-newPointAJ: [13.631470, 123.231690],
+        newPointAI: [13.631930, 123.232070],
+        newPointAJ: [13.631470, 123.231690],
         newPointAK: [13.631220, 123.231650],
-newPointAL: [13.631970, 123.231740],
-newPointAL1: [13.631930, 123.231740],
-newPointAM: [13.632390, 123.231780],
-newPointAM1: [13.632160, 123.231760],
-newPointAN: [13.632070, 123.230730],
-newPointAO: [13.632300, 123.230750],
-newPointAP: [13.632530, 123.230770],
-newPointAQ: [13.632750, 123.230790],
-newPointAR: [13.632970, 123.230820],
-newPointAR1: [13.633140, 123.230820],
-newPointAS: [13.631650, 123.230680],
-newPointAS1: [13.631370, 123.230630],
-newPointAT: [13.631870, 123.230720],
-newPointAU: [13.632220, 123.231200],
-newPointAV: [13.632460, 123.231250],
-newPointAW: [13.632660, 123.231280],
-newPointAX: [13.632900, 123.231300],
-newPointAY: [13.632680, 123.231450],
-newPointAZ: [13.632020, 123.231150],
-newPointAZ1: [13.632020, 123.231190],
-newPointBA: [13.631790, 123.231120],
-newPointBB: [13.631590, 123.231090],
-newPointBC: [13.631700, 123.231720],
-newPointBD: [13.631790, 123.229710],
-newPointBE: [13.631540, 123.229680],
-newPointBF: [13.632000, 123.229750],
-newPointBG: [13.632230, 123.229795],
-newPointBH: [13.632440, 123.229790],
-newPointBI: [13.6326550, 123.229800],
-newPointBJ: [13.632760, 123.229810],
-newPointBK: [13.632900, 123.229850],
-newPointBL: [13.633430, 123.229900],
-newPointBM: [13.633580, 123.229935],
+        newPointAL: [13.631970, 123.231740],
+        newPointAL1: [13.631930, 123.231740],
+        newPointAM: [13.632390, 123.231780],
+        newPointAM1: [13.632160, 123.231760],
+        newPointAN: [13.632070, 123.230730],
+        newPointAO: [13.632300, 123.230750],
+        newPointAP: [13.632530, 123.230770],
+        newPointAQ: [13.632750, 123.230790],
+        newPointAR: [13.632970, 123.230820],
+        newPointAR1: [13.633140, 123.230820],
+        newPointAS: [13.631650, 123.230680],
+        newPointAS1: [13.631370, 123.230630],
+        newPointAT: [13.631870, 123.230720],
+        newPointAU: [13.632220, 123.231200],
+        newPointAV: [13.632460, 123.231250],
+        newPointAW: [13.632660, 123.231280],
+        newPointAX: [13.632900, 123.231300],
+        newPointAY: [13.632680, 123.231450],
+        newPointAZ: [13.632020, 123.231150],
+        newPointAZ1: [13.632020, 123.231190],
+        newPointBA: [13.631790, 123.231120],
+        newPointBB: [13.631590, 123.231090],
+        newPointBC: [13.631700, 123.231720],
+        newPointBD: [13.631790, 123.229710],
+        newPointBE: [13.631540, 123.229680],
+        newPointBF: [13.632000, 123.229750],
+        newPointBG: [13.632230, 123.229795],
+        newPointBH: [13.632440, 123.229790],
+        newPointBI: [13.6326550, 123.229800],
+        newPointBJ: [13.632760, 123.229810],
+        newPointBK: [13.632900, 123.229850],
+        newPointBL: [13.633430, 123.229900],
+        newPointBM: [13.633580, 123.229935],
         newPointBN: [13.634330, 123.230020],
         newPointBN1: [13.634080, 123.230000],
-newPointBO: [13.634080, 123.229580],
-newPointBP: [13.633150, 123.230640],
-newPointBQ: [13.632820, 123.230610],
-newPointBR: [13.632850, 123.230400],
-newPointBS: [13.632880, 123.230225],
-newPointBT: [13.632900, 123.230040],
-newPointBU: [13.633350, 123.230460],
-newPointBV: [13.633410, 123.230280],
-newPointBW: [13.633450, 123.230100],
-newPointBX: [13.633580, 123.230090],
-newPointBY: [13.633430, 123.229680],
-newPointBZ: [13.632760, 123.229600],
-newPointCA: [13.632780, 123.229370],
-newPointCB: [13.632800, 123.229150],
-newPointCC: [13.632800, 123.228930],
-newPointCC1: [13.632990, 123.228940],
-newPointCD: [13.632860, 123.228530],
-newPointCE: [13.633300, 123.229430],
-newPointCF: [13.633250, 123.229170],
-newPointCG: [13.633000, 123.228650],
-newPointCH: [13.632340, 123.228995],
-newPointCI: [13.632150, 123.228880],
-newPointCJ: [13.631890, 123.228860],
-newPointCK: [13.631640, 123.228800],
-newPointCL: [13.631950, 123.228600],
-newPointCM: [13.632170, 123.228640],
-newPointCN: [13.631690, 123.228580],
-newPointCO: [13.632070, 123.227730],
-newPointCP: [13.632300, 123.227780],
-newPointCQ: [13.632500, 123.227800],
-newPointCR: [13.632430, 123.228150],
-newPointCS: [13.632250, 123.228150],
-newPointCT: [13.631780, 123.227680],
-newPointCU: [13.629600, 123.229050],
-newPointCV: [13.630250, 123.228620],
-newPointCW: [13.630350, 123.229120],
-newPointCX: [13.631570, 123.229280],
+        newPointBO: [13.634080, 123.229580],
+        newPointBP: [13.633150, 123.230640],
+        newPointBQ: [13.632820, 123.230610],
+        newPointBR: [13.632850, 123.230400],
+        newPointBS: [13.632880, 123.230225],
+        newPointBT: [13.632900, 123.230040],
+        newPointBU: [13.633350, 123.230460],
+        newPointBV: [13.633410, 123.230280],
+        newPointBW: [13.633450, 123.230100],
+        newPointBX: [13.633580, 123.230090],
+        newPointBY: [13.633430, 123.229680],
+        newPointBZ: [13.632760, 123.229600],
+        newPointCA: [13.632780, 123.229370],
+        newPointCB: [13.632800, 123.229150],
+        newPointCC: [13.632800, 123.228930],
+        newPointCC1: [13.632990, 123.228940],
+        newPointCD: [13.632860, 123.228530],
+        newPointCE: [13.633300, 123.229430],
+        newPointCF: [13.633250, 123.229170],
+        newPointCG: [13.633000, 123.228650],
+        newPointCH: [13.632340, 123.228995],
+        newPointCI: [13.632150, 123.228880],
+        newPointCJ: [13.631890, 123.228860],
+        newPointCK: [13.631640, 123.228800],
+        newPointCL: [13.631950, 123.228600],
+        newPointCM: [13.632170, 123.228640],
+        newPointCN: [13.631690, 123.228580],
+        newPointCO: [13.632070, 123.227730],
+        newPointCP: [13.632300, 123.227780],
+        newPointCQ: [13.632500, 123.227800],
+        newPointCR: [13.632430, 123.228150],
+        newPointCS: [13.632250, 123.228150],
+        newPointCT: [13.631780, 123.227680],
+        newPointCU: [13.629600, 123.229050],
+        newPointCV: [13.630250, 123.228620],
+        newPointCW: [13.630350, 123.229120],
+        newPointCX: [13.631570, 123.229280],
 
-newPointCY: [13.631950, 123.226700],
-    newPointCZ: [13.631450, 123.226470],
-    newPointCZ1: [13.631490, 123.226650],
-    newPointDa: [13.63212, 123.22579],
-    newPointDb: [13.63130, 123.22558],
-    newPointDc: [13.63160, 123.22586],
-    newPointDc1: [13.63160, 123.22566],
-    newPointDe: [13.63275, 123.22527],
-    newPointDe1: [13.63287, 123.22527],
-    newPointDe2: [13.63319, 123.22537],
-    newPointDf: [13.63271, 123.22618],
-    newPointDg: [13.63316, 123.22629],
-    newPointDh: [13.63269, 123.22640],
-    newPointDi: [13.63268, 123.22658],
-    newPointDj: [13.63299, 123.22668],
-    newPointDk: [13.63310, 123.22651],
-    newPointDl: [13.63331, 123.22550],
-    newPointDn: [13.63301, 123.224722],
-    newPointDp: [13.63320, 123.22402],
-    newPointDq: [13.63220, 123.22447],
-    newPointDr: [13.63199, 123.22441],
-    newPointDs: [13.63190, 123.22510],
-    newPointDt: [13.63164, 123.22507],
-    newPointDu: [13.63175, 123.22437],
-    newPointDv: [13.63181, 123.22386],
-    newPointDw: [13.63207, 123.22388],
-    newPointDx: [13.63137, 123.22502],
-    newPointDy: [13.63110, 123.22500],
-    newPointDz: [13.63112, 123.22484],
-    newPointEa: [13.63107, 123.22512],
-    newPointEa1: [13.63100, 123.22512],
-    newPointEb: [13.63147, 123.22433],
-    newPointEc: [13.63124, 123.224285],
-    newPointEd: [13.63118, 123.22456],
-    newPointEe: [13.63133, 123.223823],
-    newPointEf: [13.63148, 123.22403],
-    newPointEg: [13.63116, 123.22427],
-    newPointEg1: [13.63120, 123.22405],
-    newPointEg2: [13.63125, 123.22400],
-    newPointEh: [13.63072, 123.22423],
-    newPointEh1: [13.63065, 123.22412],
-    newPointEi: [13.62995, 123.22393],
-    newPointEj: [13.62992, 123.22370],
-    newPointEj1: [13.62984, 123.22345],
-    newPointEk: [13.62903, 123.22303],
-    newPointEl: [13.62977, 123.22421],
-    newPointEm: [13.62958, 123.22448],
-    newPointEn: [13.62936, 123.22475],
-    newPointEn1: [13.62939, 123.22485],
-    newPointEo: [13.62958, 123.22509],
-    newPointEp: [13.62975, 123.22538],
-    newPointEr: [13.63003, 123.22629],
-    newPointEs: [13.63019, 123.22629],
-    newPointEt: [13.63008, 123.22539],
-    newPointEu: [13.63053, 123.22537],
-    newPointEv: [13.63052, 123.22612],
-    newPointEv1: [13.63055, 123.22582],
-    newPointEw: [13.63091, 123.22539],
-    newPointEy: [13.63323, 123.22264],
-    newPointFa: [13.63292, 123.22164],
-    newPointFe: [13.63399, 123.22045],
-    newPointFh: [13.63563, 123.22235],
-    newPointFk: [13.632010, 123.229450],
-    newPointFl: [13.632500, 123.229800],
-    newPointFm: [13.633000, 123.230100],
-    newPointFn: [13.633500, 123.230400],
-            // You can add more points from your data here
-          };
+        newPointCY: [13.631950, 123.226700],
+        newPointCZ: [13.631450, 123.226470],
+        newPointCZ1: [13.631490, 123.226650],
+        newPointDa: [13.63212, 123.22579],
+        newPointDb: [13.63130, 123.22558],
+        newPointDc: [13.63160, 123.22586],
+        newPointDc1: [13.63160, 123.22566],
+        newPointDe: [13.63275, 123.22527],
+        newPointDe1: [13.63287, 123.22527],
+        newPointDe2: [13.63319, 123.22537],
+        newPointDf: [13.63271, 123.22618],
+        newPointDg: [13.63316, 123.22629],
+        newPointDh: [13.63269, 123.22640],
+        newPointDi: [13.63268, 123.22658],
+        newPointDj: [13.63299, 123.22668],
+        newPointDk: [13.63310, 123.22651],
+        newPointDl: [13.63331, 123.22550],
+        newPointDn: [13.63301, 123.224722],
+        newPointDp: [13.63320, 123.22402],
+        newPointDq: [13.63220, 123.22447],
+        newPointDr: [13.63199, 123.22441],
+        newPointDs: [13.63190, 123.22510],
+        newPointDt: [13.63164, 123.22507],
+        newPointDu: [13.63175, 123.22437],
+        newPointDv: [13.63181, 123.22386],
+        newPointDw: [13.63207, 123.22388],
+        newPointDx: [13.63137, 123.22502],
+        newPointDy: [13.63110, 123.22500],
+        newPointDz: [13.63112, 123.22484],
+        newPointEa: [13.63107, 123.22512],
+        newPointEa1: [13.63100, 123.22512],
+        newPointEb: [13.63147, 123.22433],
+        newPointEc: [13.63124, 123.224285],
+        newPointEd: [13.63118, 123.22456],
+        newPointEe: [13.63133, 123.223823],
+        newPointEf: [13.63148, 123.22403],
+        newPointEg: [13.63116, 123.22427],
+        newPointEg1: [13.63120, 123.22405],
+        newPointEg2: [13.63125, 123.22400],
+        newPointEh: [13.63072, 123.22423],
+        newPointEh1: [13.63065, 123.22412],
+        newPointEi: [13.62995, 123.22393],
+        newPointEj: [13.62992, 123.22370],
+        newPointEj1: [13.62984, 123.22345],
+        newPointEk: [13.62903, 123.22303],
+        newPointEl: [13.62977, 123.22421],
+        newPointEm: [13.62958, 123.22448],
+        newPointEn: [13.62936, 123.22475],
+        newPointEn1: [13.62939, 123.22485],
+        newPointEo: [13.62958, 123.22509],
+        newPointEp: [13.62975, 123.22538],
+        newPointEr: [13.63003, 123.22629],
+        newPointEs: [13.63019, 123.22629],
+        newPointEt: [13.63008, 123.22539],
+        newPointEu: [13.63053, 123.22537],
+        newPointEv: [13.63052, 123.22612],
+        newPointEv1: [13.63055, 123.22582],
+        newPointEw: [13.63091, 123.22539],
+        newPointEy: [13.63323, 123.22264],
+        newPointFa: [13.63292, 123.22164],
+        newPointFe: [13.63399, 123.22045],
+        newPointFh: [13.63563, 123.22235],
+        newPointFk: [13.632010, 123.229450],
+        newPointFl: [13.632500, 123.229800],
+        newPointFm: [13.633000, 123.230100],
+        newPointFn: [13.633500, 123.230400],
+        newPointFm: [13.62844, 123.24328],
+        newPointFo: [13.62870, 123.24326],
+        newPointFp: [13.62888, 123.24327],
+        newPointFq: [13.62902, 123.24329],
+        newPointFr: [13.62819, 123.24484],
+        newPointFs: [13.62817, 123.24511],
+        newPointFt: [13.62826, 123.24512],
+        newPointFu: [13.62844, 123.24536],
+        newPointFv: [13.62860, 123.24550],
+        newPointFw: [13.62908, 123.24564],
+        newPointFx: [13.62960, 123.24577],
+        newPointFy: [13.62990, 123.24579],
+        newPointFz: [13.63008, 123.24570],
+        newPointGa: [13.63033, 123.24561],
+        newPointGb: [13.63061, 123.24561],
+        newPointGc: [13.63050, 123.24587],
+        newPointGd: [13.63044, 123.24615],
+        newPointGe: [13.63043, 123.24699],
+        newPointGf: [13.63028, 123.24764],
+        newPointGg: [13.62800, 123.24641],
+        newPointGh: [13.62785, 123.24720],
+        newPointGi: [13.62619, 123.24716],
+        newPointGj: [13.62761, 123.24924],
+        newPointGk: [13.62782, 123.24928],
+        newPointGl: [13.62798, 123.24928],
+        newPointGm: [13.62821, 123.24925],
+        newPointGn: [13.62834, 123.24907],
+        newPointGo: [13.62758, 123.24948],
+        newPointGp: [13.62757, 123.24987],
+        newPointGq: [13.62759, 123.25036],
+        newPointGr: [13.62702, 123.25037],
+        newPointGs: [13.62689, 123.25021],
+        newPointGt: [13.62629, 123.25021],
+        newPointGu: [13.62622, 123.25002],
+        newPointGv: [13.62617, 123.24999],
+        newPointGw: [13.62507, 123.25011],
+        newPointGx: [13.62502, 123.25017],
+        newPointGy: [13.62502, 123.25031],
+        newPointGz: [13.62506, 123.25034],
+        newPointHa: [13.62496, 123.25045],
+        newPointHb: [13.62502, 123.25061],
+        newPointHc: [13.62499, 123.25070],
+        newPointHd: [13.62490, 123.25072],
+        newPointHe: [13.62483, 123.25067],
+        newPointHf: [13.62483, 123.25059],
+        newPointHg: [13.62487, 123.25053],
+        newPointHi: [13.62456, 123.25046],
+        newPointHj: [13.62372, 123.25080],
+        newPointHk: [13.62351, 123.25078],
+        newPointHl: [13.62325, 123.25000],
+        newPointHm: [13.62354, 123.24989],
+        newPointHn: [13.62392, 123.24974],
+        newPointHo: [13.62787, 123.25136],
+        newPointHp: [13.62854, 123.25285],
+        newPointHq: [13.62882, 123.25292],
+        newPointHr: [13.62915, 123.25350],
+        newPointHs: [13.62935, 123.25342],
+        newPointHt: [13.62949, 123.25345],
+        newPointHu: [13.62973, 123.25364],
+        newPointHv: [13.62997, 123.25387],
+        newPointHw: [13.63003, 123.25442],
+        newPointHx: [13.63026, 123.25458],
+        newPointHy: [13.63051, 123.25481],
+        newPointHz: [13.63076, 123.25484],
+        newPointIa: [13.63102, 123.25486],
+        newPointIb: [13.63191, 123.25482],
+        newPointIc: [13.63191, 123.25456],
+        newPointId: [13.63101, 123.25458],
+        newPointIe: [13.63099, 123.25435],
+        newPointIf: [13.63190, 123.25432],
+        newPointIg: [13.63190, 123.25408],
+        newPointIh: [13.63177, 123.25405],
+        newPointIi: [13.63189, 123.25342],
+        newPointIj: [13.63219, 123.25336],
+        newPointIk: [13.63163, 123.25345],
+        newPointIl: [13.63154, 123.25406],
+        newPointIm: [13.63128, 123.25407],
+        newPointIn: [13.63108, 123.25407],
+        newPointIo: [13.63097, 123.25407],
+        newPointIp: [13.63139, 123.25349],
+        newPointIq: [13.63129, 123.25344],
+        newPointIr: [13.63122, 123.25331],
+        newPointIs: [13.63093, 123.25280],
+        newPointIt: [13.63095, 123.25386],
+        newPointIu: [13.63071, 123.25386],
+        newPointIv: [13.63066, 123.25281],
+        newPointIw: [13.63042, 123.25278],
+        newPointIx: [13.63020, 123.25277],
+        newPointIy: [13.63046, 123.25387],
+        newPointIz: [13.63024, 123.25387],
+        newPointJa: [13.63009, 123.25276],
+        newPointJb: [13.63010, 123.25244],
+        newPointJc: [13.63075, 123.25246],
+        newPointJd: [13.62995, 123.25283],
+        newPointJe: [13.62973, 123.25285],
+        newPointJf: [13.62947, 123.25287],
+        newPointJg: [13.62911, 123.25288],
+
+        // You can add more points from your data here
+      };
           
           const map = L.map('map', {
             center: nodeCoordinates.defaultStartNode,
@@ -427,9 +525,9 @@ newPointCY: [13.631950, 123.226700],
           }
 
           // Connections between nodes
-          const connections = {
-            defaultStartNode: ['pointA','newPointD'],
-        pointA: ['defaultStartNode', 'pointB','newPointAE'],
+const connections = {
+        defaultStartNode: ['pointA', 'newPointD'],
+        pointA: ['defaultStartNode', 'pointB', 'newPointAE', 'newPointFm'],
         pointB: ['pointA', 'pointC', 'pointN', 'pointM'],
         pointC: ['pointB', 'pointD', 'pointK'],
         pointD: ['pointC', 'pointE'],
@@ -444,12 +542,12 @@ newPointCY: [13.631950, 123.226700],
         newPointK: ['newPointF', 'newPointC', 'pointN', 'pointQ'],
         pointO: ['pointN', 'pointP', 'pointQ', 'pointM'],
         pointP: ['pointO', 'pointL', 'pointT', 'newPointL'],
-        newPointL: ['newPointO1', 'newPointM','pointP'],
+        newPointL: ['newPointO1', 'newPointM', 'pointP'],
         newPointO1: ['newPointL', 'newPointO'],
         newPointO: ['newPointO1', 'newPointM'],
         newPointM: ['newPointO', 'newPointL', 'newPointN'],
         newPointN: ['newPointM'],
-        pointQ: ['pointO', 'pointR','newPointK', 'newPointG'],
+        pointQ: ['pointO', 'pointR', 'newPointK', 'newPointG'],
         newPointG: ['newPointH1', 'newPointF', 'pointQ'],
         newPointF: ['newPointG', 'newPointE', 'newPointK'],
         newPointE: ['newPointF', 'newPointR', 'newPointE1'],
@@ -462,13 +560,13 @@ newPointCY: [13.631950, 123.226700],
         newPointE7: ['newPointE6', 'newPointE8'],
         newPointE8: ['newPointE7', 'newPointE9'],
         newPointE9: ['newPointE8', 'newPointAK'],
-        newPointR: ['newPointE', 'newPointQ', ],
+        newPointR: ['newPointE', 'newPointQ',],
         newPointQ: ['newPointR', 'newPointC', 'newPointT'],
         newPointC: ['newPointQ', 'newPointQ', 'newPointP', 'newPointV'],
         newPointV: ['newPointC', 'newPointD', 'newPointW1'],
         newPointW: ['newPointW1', 'newPointP', 'newPointAA2',],
         newPointH1: ['newPointG', 'newPointH', 'newPointJ'],
-        newPointJ: ['newPointH1', 'newPointI','pointR'],
+        newPointJ: ['newPointH1', 'newPointI', 'pointR'],
         newPointH: ['newPointI', 'newPointH1'],
         newPointI: ['newPointH', 'newPointJ', 'pointS'],
         pointR: ['pointQ', 'pointT', 'newPointJ'],
@@ -526,14 +624,14 @@ newPointCY: [13.631950, 123.226700],
         extPointQ: ['extPointP', 'extPointR'],
         extPointR: ['extPointQ', 'extPointS'],
         extPointS: ['extPointR', 'extPointT', 'extPointNleft2'],
-        extPointT: ['extPointS', 'extPointU','newPointFa'],
+        extPointT: ['extPointS', 'extPointU', 'newPointFa'],
         newPointFa: ['extPointT'],
         extPointU: ['extPointT', 'extPointV'],
-        extPointV: ['extPointU', 'extPointW','newPointEy'],
+        extPointV: ['extPointU', 'extPointW', 'newPointEy'],
         newPointEy: ['extPointV'],
         extPointW: ['extPointV', 'extPointX', 'newPointDp'],
         newPointDp: ['extPointW'],
-        extPointX: ['extPointW', 'extPointY','newPointDq'],
+        extPointX: ['extPointW', 'extPointY', 'newPointDq'],
         newPointDq: ['extPointX', 'newPointDr'],
         newPointDr: ['newPointDq', 'newPointDs', 'newPointDw', 'newPointDu'],
         newPointDw: ['newPointDr', 'newPointDv'],
@@ -562,7 +660,7 @@ newPointCY: [13.631950, 123.226700],
         newPointEm: ['newPointEd', 'newPointEn', 'newPointEl'],
         newPointEb: ['newPointDu', 'newPointDx', 'newPointEc'],
         newPointEc: ['newPointEb', 'newPointEd', 'newPointEg'],
-        newPointEg: ['newPointEc', 'newPointEg1','newPointEh'],
+        newPointEg: ['newPointEc', 'newPointEg1', 'newPointEh'],
         newPointEg1: ['newPointEg', 'newPointEg2'],
         newPointEg2: ['newPointEg1', 'newPointEf'],
         newPointEf: ['newPointEg2'],
@@ -587,7 +685,7 @@ newPointCY: [13.631950, 123.226700],
         newPointAB: ['newPointAB2', 'newPointAA', 'newPointAB1'],
         newPointAA: ['newPointAB', 'newPointAA2', 'newPointAA1'],
         newPointZ: ['newPointAB2', 'newPointZ2', 'newPointAC'],
-        newPointAC: ['newPointZ', 'newPointAD','newPointY'],
+        newPointAC: ['newPointZ', 'newPointAD', 'newPointY'],
         newPointAD: ['newPointAC'],
         newPointY: ['newPointAC', 'newPointX'],
         newPointX: ['newPointY', 'newPointAE'],
@@ -653,7 +751,7 @@ newPointCY: [13.631950, 123.226700],
         newPointBE: ['newPointAG', 'newPointBD', 'newPointCX'],
         newPointAG: ['newPointAS1', 'newPointBE', 'newPointAF'],
         newPointAF: ['newPointAG'],
-        newPointCX: ['newPointBE', 'newPointCK','newPointCW'],
+        newPointCX: ['newPointBE', 'newPointCK', 'newPointCW'],
         newPointCW: ['newPointCX', 'newPointCV', 'newPointCU'],
         newPointCV: ['newPointCW'],
         newPointCU: ['newPointCW'],
@@ -692,11 +790,107 @@ newPointCY: [13.631950, 123.226700],
         newPointDl: ['newPointDe2'],
         newPointDf: ['newPointDe', 'newPointDg', 'newPointDh'],
         newPointDg: ['newPointDf'],
-        newPointDh: ['newPointDf', 'newPointDi','newPointDk'],
+        newPointDh: ['newPointDf', 'newPointDi', 'newPointDk'],
         newPointDk: ['newPointDh'],
         newPointDi: ['newPointDh', 'newPointDj'],
         newPointDj: ['newPointDi'],
-          };
+        newPointFm: ['pointA', 'newPointFo', 'newPointFr'],
+        newPointFo: ['newPointFm', 'newPointFp'],
+        newPointFp: ['newPointFo', 'newPointFq'],
+        newPointFq: ['newPointFp'],
+        newPointFr: ['newPointFm', 'newPointFs'],
+        newPointFs: ['newPointFr', 'newPointFt', 'newPointGg'],
+        newPointFt: ['newPointFs', 'newPointFu'],
+        newPointFu: ['newPointFt', 'newPointFv'],
+        newPointFv: ['newPointFu', 'newPointFw'],
+        newPointFw: ['newPointFv', 'newPointFx'],
+        newPointFx: ['newPointFw', 'newPointFy'],
+        newPointFy: ['newPointFx', 'newPointFz'],
+        newPointFz: ['newPointFy', 'newPointGa'],
+        newPointGa: ['newPointFz', 'newPointGb'],
+        newPointGb: ['newPointGa', 'newPointGc'],
+        newPointGc: ['newPointGb', 'newPointGd'],
+        newPointGd: ['newPointGc', 'newPointGe'],
+        newPointGe: ['newPointGd', 'newPointGf'],
+        newPointGf: ['newPointGe'],
+        newPointGg: ['newPointFs', 'newPointGh'],
+        newPointGh: ['newPointGg', 'newPointGi', 'newPointGj'],
+        newPointGi: ['newPointGh'],
+        newPointGj: ['newPointGh', 'newPointGk', 'newPointGo'],
+        newPointGk: ['newPointGj', 'newPointGl'],
+        newPointGl: ['newPointGk', 'newPointGm'],
+        newPointGm: ['newPointGl', 'newPointGn'],
+        newPointGn: ['newPointGm'],
+        newPointGo: ['newPointGj', 'newPointGp'],
+        newPointGp: ['newPointGo', 'newPointGq'],
+        newPointGq: ['newPointGp', 'newPointGr', 'newPointHo'],
+        newPointGr: ['newPointGq', 'newPointGs'],
+        newPointGs: ['newPointGr', 'newPointGt'],
+        newPointGt: ['newPointGs', 'newPointGu', 'newPointGz'],
+        newPointGu: ['newPointGt', 'newPointGv'],
+        newPointGv: ['newPointGu', 'newPointGw'],
+        newPointGw: ['newPointGv', 'newPointGx'],
+        newPointGx: ['newPointGw', 'newPointGy'],
+        newPointGy: ['newPointGx', 'newPointGz', 'newPointHi'],
+        newPointGz: ['newPointGy', 'newPointHa', 'newPointGt'],
+        newPointHa: ['newPointGz', 'newPointHb', 'newPointHg'],
+        newPointHb: ['newPointHa', 'newPointHc'],
+        newPointHc: ['newPointHb', 'newPointHd'],
+        newPointHd: ['newPointHc', 'newPointHe'],
+        newPointHe: ['newPointHd', 'newPointHf'],
+        newPointHf: ['newPointHe', 'newPointHg'],
+        newPointHg: ['newPointHf', 'newPointHa'],
+        newPointHi: ['newPointGy', 'newPointHn', 'newPointHj'],
+        newPointHj: ['newPointHi', 'newPointHk', 'newPointHl', 'newPointHm'],
+        newPointHk: ['newPointHj'],
+        newPointHl: ['newPointHj'],
+        newPointHm: ['newPointHj'],
+        newPointHn: ['newPointHi'],
+        newPointHo: ['newPointGq', 'newPointHp'],
+        newPointHp: ['newPointHo', 'newPointHq'],
+        newPointHq: ['newPointHp', 'newPointHr', 'newPointJg'],
+        newPointHr: ['newPointHq', 'newPointHs'],
+        newPointHs: ['newPointHr', 'newPointHt', 'newPointJg'],
+        newPointHt: ['newPointHs', 'newPointHu', 'newPointJf'],
+        newPointHu: ['newPointHt', 'newPointHv', 'newPointJe'],
+        newPointHv: ['newPointHu', 'newPointHw', 'newPointJd', 'newPointIz'],
+        newPointHw: ['newPointHv', 'newPointHx'],
+        newPointHx: ['newPointHw', 'newPointHy', 'newPointIz'],
+        newPointHy: ['newPointHx', 'newPointIy', 'newPointHz'],
+        newPointHz: ['newPointHy', 'newPointIu', 'newPointIa'],
+        newPointIa: ['newPointHz', 'newPointId', 'newPointIb'],
+        newPointIb: ['newPointIa', 'newPointIc'],
+        newPointIc: ['newPointIb', 'newPointId', 'newPointIf'],
+        newPointId: ['newPointIc', 'newPointIa', 'newPointIe'],
+        newPointIe: ['newPointId', 'newPointIf', 'newPointIo'],
+        newPointIf: ['newPointIe', 'newPointIc', 'newPointIg'],
+        newPointIg: ['newPointIf', 'newPointIh'],
+        newPointIh: ['newPointIg', 'newPointIi', 'newPointIl'],
+        newPointIi: ['newPointIh', 'newPointIj', 'newPointIk'],
+        newPointIj: ['newPointIi'],
+        newPointIk: ['newPointIi', 'newPointIl', 'newPointIp'],
+        newPointIl: ['newPointIk', 'newPointIh', 'newPointIm'],
+        newPointIm: ['newPointIl', 'newPointIn', 'newPointIp'],
+        newPointIn: ['newPointIm', 'newPointIo', 'newPointIr'],
+        newPointIo: ['newPointIn', 'newPointIt', 'newPointIe'],
+        newPointIp: ['newPointIk', 'newPointIm', 'newPointIq'],
+        newPointIq: ['newPointIp', 'newPointIr'],
+        newPointIr: ['newPointIq', 'newPointIs', 'newPointIn'],
+        newPointIs: ['newPointIr', 'newPointIt', 'newPointIv', 'newPointJc'],
+        newPointIt: ['newPointIs', 'newPointIu', 'newPointIo'],
+        newPointIu: ['newPointIt', 'newPointHz', 'newPointIy', 'newPointIv'],
+        newPointIv: ['newPointIu', 'newPointIs', 'newPointIw'],
+        newPointIw: ['newPointIv', 'newPointIx', 'newPointIy'],
+        newPointIx: ['newPointIw', 'newPointJa', 'newPointIz'],
+        newPointIz: ['newPointIx', 'newPointIy', 'newPointHv', 'newPointHx'],
+        newPointJa: ['newPointIx', 'newPointJb', 'newPointJd'],
+        newPointJb: ['newPointJa', 'newPointJc'],
+        newPointJc: ['newPointJb', 'newPointIs'],
+        newPointJd: ['newPointJa', 'newPointJe', 'newPointHv'],
+        newPointJe: ['newPointJd', 'newPointJf', 'newPointHu'],
+        newPointJf: ['newPointJe', 'newPointJg', 'newPointHt'],
+        newPointJg: ['newPointJf', 'newPointHq', 'newPointHs'],
+      };
 
           // Haversine formula for distances
           function getDistance(lat1, lon1, lat2, lon2) {
@@ -838,44 +1032,44 @@ newPointCY: [13.631950, 123.226700],
     if (loading) {
       return <ActivityIndicator size="large" color="#007AFF" />;
     }
-    
+
     if (incidents.length === 0) {
       return <Text style={styles.subText}>No incidents found. Please check back later.</Text>;
     }
-    
+
     return incidents.map((incident, index) => (
-      <TouchableOpacity 
-        key={incident._id || index} 
+      <TouchableOpacity
+        key={incident._id || index}
         style={styles.listItem}
         onPress={() => handleIncidentPress(incident)}
       >
         <View style={styles.incidentHeader}>
           <View style={styles.incidentIcon}>
-          <Icon name="add-alert" size={30} color="#f44336" />
+            <Icon name="add-alert" size={30} color="#f44336" />
           </View>
           <Text style={styles.listItemText}>Incident #{index + 1}</Text>
         </View>
-        
+
         <View style={styles.incidentDetail}>
           <View style={styles.iconContainer}>
             <View style={styles.detailIcon}>
-            <MaterialIcon name="person-pin" size={30} color="#393E46" />
+              <MaterialIcon name="person-pin" size={30} color="#393E46" />
             </View>
           </View>
           <Text style={styles.detailText}>{incident.username || 'Unknown'}</Text>
         </View>
-        
+
         <View style={styles.incidentDetail}>
           <View style={styles.iconContainer}>
             <View style={styles.detailIcon}>
-            <MaterialIcon name="room" size={30} color="#e91e63" />
+              <MaterialIcon name="room" size={30} color="#e91e63" />
             </View>
           </View>
           <Text style={styles.detailText}>
             Lat {incident.latitude?.toFixed(4) || 'N/A'}, Lng {incident.longitude?.toFixed(4) || 'N/A'}
           </Text>
         </View>
-        
+
         <View style={styles.incidentActions}>
           <TouchableOpacity style={styles.miniAction}>
             <Text style={styles.miniActionText}>Details</Text>
@@ -897,7 +1091,7 @@ newPointCY: [13.631950, 123.226700],
           </View>
           <Text style={styles.title}>Navigation</Text>
         </View>
-        
+
         <View style={styles.searchContainer}>
           <View style={styles.searchIconContainer}>
             <Text style={styles.searchIcon}>🔍</Text>
@@ -911,14 +1105,14 @@ newPointCY: [13.631950, 123.226700],
             <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.incidentsHeaderContainer}>
           <View style={styles.incidentsHeaderIcon}>
-          <Icon name="add-alert" size={30} color="#f44336" />
+            <Icon name="add-alert" size={30} color="#f44336" />
           </View>
           <Text style={styles.incidentsHeaderText}>Active Incidents</Text>
         </View>
-        
+
         <ScrollView style={styles.listContainer}>
           {renderIncidentList()}
         </ScrollView>
@@ -967,7 +1161,7 @@ newPointCY: [13.631950, 123.226700],
               {selectedDestination ? 'Route Information' : 'Incident Details'}
             </Text>
           </View>
-          
+
           <View style={styles.infoContainer}>
             <View style={styles.infoIconContainer}>
               <View style={styles.infoIcon}>
@@ -978,17 +1172,17 @@ newPointCY: [13.631950, 123.226700],
               {selectedDestination ? `Destination: ${selectedDestination}` : 'Location: Zone 4'}
             </Text>
           </View>
-          
+
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button}>
               <View style={styles.buttonIconContainer}>
-              <MaterialIcon name="local-post-office" size={30} color="#fff" />
+                <MaterialIcon name="local-post-office" size={30} color="#fff" />
               </View>
               <Text style={styles.buttonText}>Message</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.button, styles.callButton]}>
               <View style={styles.buttonIconContainer}>
-              <MaterialIcon name="call" size={30} color="#FF0000" />
+                <MaterialIcon name="call" size={30} color="#FF0000" />
               </View>
               <Text style={styles.buttonText}>Call</Text>
             </TouchableOpacity>
@@ -1097,7 +1291,7 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
   },
-  
+
   // Incident item styles
   listItem: {
     padding: 14,
@@ -1178,7 +1372,7 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontWeight: '600',
   },
-  
+
   // Right container styles
   rightContainer: {
     flex: 2,
@@ -1205,7 +1399,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   // Bottom container styles
   bottomContainer: {
     padding: 18,
