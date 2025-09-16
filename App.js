@@ -12,6 +12,8 @@ import NavigationScreen from './screens/NavigationScreen';
 import MessagesScreen from './screens/MessagesScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import LogoutScreen from './screens/LogoutScreen';
+import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignupScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -170,7 +172,8 @@ const DrawerNavigator = () => {
         overlayColor: 'rgba(0, 0, 0, 0.5)',
       }}
     >
-      <Drawer.Screen name="Main" component={MainStackNavigator} />
+      <Drawer.Screen name="Login" component={LoginScreen} />
+      <Drawer.Screen name="Sign Up" component={SignupScreen} />
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
       <Drawer.Screen name="Navigation" component={NavigationScreen} />
       <Drawer.Screen name="Messages" component={MessagesScreen} />

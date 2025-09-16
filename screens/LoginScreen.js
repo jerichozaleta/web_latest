@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import Logo from '../images/resqyou.png'; // Correctly import the logo image
 
+
+
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -28,6 +30,7 @@ const LoginScreen = ({ navigation }) => {
     } else {
       Alert.alert('Error', 'Invalid username or password');
     }
+    
   };
 
   return (
@@ -52,6 +55,9 @@ const LoginScreen = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
         />
+        <View style={styles.signupText}>
+          <Text>Don't have an account? <TouchableOpacity style={styles.signupLink} onPress={() => navigation.navigate('Sign Up')}><Text style={styles.signupText} >Sign Up</Text></TouchableOpacity></Text>
+        </View>
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
@@ -116,6 +122,14 @@ const styles = StyleSheet.create({
     fontSize: 20, // Increased font size for better readability
     fontWeight: 'bold',
   },
+  signupText: {
+    color: '#141414ff',
+    marginTop: 10,
+  },
+  signupLink:{
+    color: '#181818ff',
+    fontWeight: 'bold',
+  }
 });
 
 export default LoginScreen;
