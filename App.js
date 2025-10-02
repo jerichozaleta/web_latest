@@ -2,7 +2,6 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -13,11 +12,9 @@ import MessagesScreen from './screens/MessagesScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import LogoutScreen from './screens/LogoutScreen';
 import LoginScreen from './screens/LoginScreen';
-import SignupScreen from './screens/SignupScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
 
 // Custom Drawer Content Component
 const CustomDrawerContent = ({ navigation, state }) => {
@@ -80,63 +77,6 @@ const CustomDrawerContent = ({ navigation, state }) => {
   );
 };
 
-// Bottom Tab Navigator Component
-const MainTabNavigator = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          switch (route.name) {
-            case 'Dashboard':
-              iconName = 'dashboard';
-              break;
-            case 'Navigation':
-              iconName = 'navigation';
-              break;
-            case 'Messages':
-              iconName = 'message';
-              break;
-            case 'Settings':
-              iconName = 'settings';
-              break;
-            default:
-              iconName = 'home';
-          }
-
-          return <Icon name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#4ECDC4',
-        tabBarInactiveTintColor: '#666',
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E1E8ED',
-          borderTopWidth: 1,
-          paddingBottom: 5,
-          paddingTop: 5,
-          height: 60,
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
-        },
-      })}
-    >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Navigation" component={NavigationScreen} />
-      <Tab.Screen name="Messages" component={MessagesScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-    </Tab.Navigator>
-  );
-};
-
 // Stack Navigator for screens that need to be pushed
 const MainStackNavigator = () => {
   return (
@@ -148,7 +88,8 @@ const MainStackNavigator = () => {
         animationTypeForReplace: 'push',
       }}
     >
-      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      <Stack.Screen name="Dashboard" component={DashboardScreen} />
+      <Stack.Screen name="Navigation" component={NavigationScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Messages" component={MessagesScreen} />
       <Stack.Screen name="Logout" component={LogoutScreen} />
@@ -171,9 +112,9 @@ const DrawerNavigator = () => {
         drawerType: 'slide',
         overlayColor: 'rgba(0, 0, 0, 0.5)',
       }}
+      initialRouteName="Main"
     >
-      <Drawer.Screen name="Login" component={LoginScreen} />
-      <Drawer.Screen name="Sign Up" component={SignupScreen} />
+      <Drawer.Screen name="Main" component={MainStackNavigator} />
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
       <Drawer.Screen name="Navigation" component={NavigationScreen} />
       <Drawer.Screen name="Messages" component={MessagesScreen} />

@@ -11,9 +11,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import NavigationOutlinedIcon from '@mui/icons-material/NavigationOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Icon } from 'react-native-elements';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,11 +34,20 @@ const WebViewComponent = (props) => {
   }
 };
 
-const NavigationScreen = () => {
+const NavigationScreen = ({ navigation }) => {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDestination, setSelectedDestination] = useState(null);
   const webViewRef = useRef(null);
+
+  const handleBackPress = () => {
+    if (navigation && navigation.goBack) {
+      navigation.goBack();
+    } else {
+      console.log('Back button pressed');
+      // Add your custom back navigation logic here
+    }
+  };
 
   useEffect(() => {
     const fetchIncidents = async () => {
@@ -70,7 +79,6 @@ const NavigationScreen = () => {
 
   const selectDestination = (pointName) => {
     setSelectedDestination(pointName);
-
     if (webViewRef.current && Platform.OS !== 'web') {
       // For React Native WebView
       webViewRef.current.injectJavaScript(`
@@ -110,23 +118,44 @@ const NavigationScreen = () => {
   };
 
   const leafletHtml = `<!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-      <style>
-        html, body { height: 100%; margin: 0; padding: 0; }
-        #map { width: 100%; height: 100%; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
-        .leaflet-popup-content { font-family: Arial, sans-serif; font-size: 12px; }
-        .leaflet-popup-content-wrapper { border-radius: 5px; }
-      </style>
-    </head>
-    <body>
-      <div id="map"></div>
-      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-      <script>
-        document.addEventListener('DOMContentLoaded', function () {
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+    .leaflet-popup-content {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+    .leaflet-popup-content-wrapper {
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
       const nodeCoordinates = {
         defaultStartNode: [13.628913, 123.240131],
         pointA: [13.628832, 123.240675],
@@ -494,41 +523,38 @@ const NavigationScreen = () => {
         newPointJe: [13.62973, 123.25285],
         newPointJf: [13.62947, 123.25287],
         newPointJg: [13.62911, 123.25288],
-
         // You can add more points from your data here
       };
-          
-          const map = L.map('map', {
-            center: nodeCoordinates.defaultStartNode,
-            zoom: 15,
-            zoomControl: true
-          });
 
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 19,
-          }).addTo(map);
+      const map = L.map('map', {
+        center: nodeCoordinates.defaultStartNode,
+        zoom: 15,
+        zoomControl: true
+      });
 
-          // Add markers with tooltips for each node
-          for (const [nodeName, coords] of Object.entries(nodeCoordinates)) {
-            L.circleMarker(coords, {
-              radius: 5,
-              color: '#3388ff',
-              fillColor: '#3388ff',
-              fillOpacity: 0.8
-            })
-            .bindTooltip(nodeName, {
-              permanent: false,
-              direction: 'top'
-            })
-            .addTo(map);
-          }
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19,
+      }).addTo(map);
 
-          // Connections between nodes
-const connections = {
+      // Add markers with tooltips for each node
+      for (const [nodeName, coords] of Object.entries(nodeCoordinates)) {
+        L.circleMarker(coords, {
+          radius: 5,
+          color: '#3388ff',
+          fillColor: '#3388ff',
+          fillOpacity: 0.8
+        })
+          .bindTooltip(nodeName, { permanent: false, direction: 'top' })
+          .addTo(map);
+      }
+
+      // Connections between nodes
+      const connections = {
         defaultStartNode: ['pointA', 'newPointD'],
         pointA: ['defaultStartNode', 'pointB', 'newPointAE', 'newPointFm'],
-        pointB: ['pointA', 'pointC', 'pointN', 'pointM'],
+        newPointJg: ['newPointJf', 'newPointHq', 'newPointHs'],
+         pointB: ['pointA', 'pointC', 'pointN', 'pointM'],
         pointC: ['pointB', 'pointD', 'pointK'],
         pointD: ['pointC', 'pointE'],
         pointE: ['pointD', 'pointF', 'pointK'],
@@ -889,136 +915,139 @@ const connections = {
         newPointJd: ['newPointJa', 'newPointJe', 'newPointHv'],
         newPointJe: ['newPointJd', 'newPointJf', 'newPointHu'],
         newPointJf: ['newPointJe', 'newPointJg', 'newPointHt'],
-        newPointJg: ['newPointJf', 'newPointHq', 'newPointHs'],
       };
 
-          // Haversine formula for distances
-          function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) ** 2 +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon / 2) ** 2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-          }
+      // Haversine formula for distances
+      function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 +
+          Math.cos(lat1 * Math.PI / 180) *
+          Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      }
 
-          // Build weighted graph
-          const graph = {};
-          for (const [node, neighbors] of Object.entries(connections)) {
-            graph[node] = {};
-            for (const neighbor of neighbors) {
-              graph[node][neighbor] = getDistance(...nodeCoordinates[node], ...nodeCoordinates[neighbor]);
-            }
-          }
+      // Build weighted graph
+      const graph = {};
+      for (const [node, neighbors] of Object.entries(connections)) {
+        graph[node] = {};
+        for (const neighbor of neighbors) {
+          graph[node][neighbor] = getDistance(...nodeCoordinates[node], ...nodeCoordinates[neighbor]);
+        }
+      }
 
-          // Dijkstra algorithm
-          function dijkstra(graph, start, end) {
-            const distances = {};
-            const previous = {};
-            const visited = new Set();
-            const nodes = new Set(Object.keys(graph));
+      // Dijkstra algorithm
+      function dijkstra(graph, start, end) {
+        const distances = {};
+        const previous = {};
+        const visited = new Set();
+        const nodes = new Set(Object.keys(graph));
 
-            for (const node of nodes) {
-              distances[node] = Infinity;
-              previous[node] = null;
-            }
-            distances[start] = 0;
+        for (const node of nodes) {
+          distances[node] = Infinity;
+          previous[node] = null;
+        }
+        distances[start] = 0;
 
-            while (nodes.size) {
-              const current = [...nodes].reduce((a, b) => distances[a] < distances[b] ? a : b);
-              if (current === end) break;
-              nodes.delete(current);
-              visited.add(current);
+        while (nodes.size) {
+          const current = [...nodes].reduce((a, b) => distances[a] < distances[b] ? a : b);
+          if (current === end) break;
 
-              for (const neighbor in graph[current]) {
-                if (!visited.has(neighbor)) {
-                  const newDist = distances[current] + graph[current][neighbor];
-                  if (newDist < distances[neighbor]) {
-                    distances[neighbor] = newDist;
-                    previous[neighbor] = current;
-                  }
-                }
+          nodes.delete(current);
+          visited.add(current);
+
+          for (const neighbor in graph[current]) {
+            if (!visited.has(neighbor)) {
+              const newDist = distances[current] + graph[current][neighbor];
+              if (newDist < distances[neighbor]) {
+                distances[neighbor] = newDist;
+                previous[neighbor] = current;
               }
             }
-
-            const path = [];
-            let curr = end;
-            while (curr) {
-              path.unshift(curr);
-              curr = previous[curr];
-            }
-
-            return { path, distance: distances[end] };
           }
+        }
 
-          // Draw polyline for route
-          let currentRouteLine = null;
-          function drawRoute(path) {
-            if (currentRouteLine) {
-              map.removeLayer(currentRouteLine);
-            }
-            const latlngs = path.map(name => nodeCoordinates[name]);
-            currentRouteLine = L.polyline(latlngs, { color: 'blue', weight: 5 }).addTo(map);
-            
-            // Fit map to show the entire route
-            if (latlngs.length > 0) {
-              map.fitBounds(L.latLngBounds(latlngs), { padding: [30, 30] });
-            }
-          }
+        const path = [];
+        let curr = end;
+        while (curr) {
+          path.unshift(curr);
+          curr = previous[curr];
+        }
 
-          // Draw lines between connected nodes
-          for (const [node, neighbors] of Object.entries(connections)) {
-            for (const neighbor of neighbors) {
-              const latlngs = [nodeCoordinates[node], nodeCoordinates[neighbor]];
-              L.polyline(latlngs, { color: 'gray', weight: 2, dashArray: '4' }).addTo(map);
-            }
-          }
-          
-          // Add clickable markers
-          for (const [name, coords] of Object.entries(nodeCoordinates)) {
-            const label = name === 'defaultStartNode' ? 'default starting node' : name;
-            const marker = L.circleMarker(coords, {
-              radius: 5,
-              color: 'red',
-              fillColor: 'red',
-              fillOpacity: 0.8
-            }).addTo(map).bindPopup(label);
+        return { path, distance: distances[end] };
+      }
 
-            marker.on('click', () => {
-              if (name === 'defaultStartNode') return;
-              const result = dijkstra(graph, 'defaultStartNode', name);
-              console.log("Route to", name, result);
-              drawRoute(result.path);
-              
-              // Send message to React Native if not on web
-              if (window.ReactNativeWebView) {
-                window.ReactNativeWebView.postMessage(JSON.stringify({
-                  type: 'ROUTE_SELECTED',
-                  destination: name,
-                  distance: result.distance,
-                  path: result.path
-                }));
-              }
-            });
+      // Draw polyline for route
+      let currentRouteLine = null;
+      function drawRoute(path) {
+        if (currentRouteLine) {
+          map.removeLayer(currentRouteLine);
+        }
+
+        const latlngs = path.map(name => nodeCoordinates[name]);
+        currentRouteLine = L.polyline(latlngs, { color: 'blue', weight: 5 }).addTo(map);
+
+        // Fit map to show the entire route
+        if (latlngs.length > 0) {
+          map.fitBounds(L.latLngBounds(latlngs), { padding: [30, 30] });
+        }
+      }
+
+      // Draw lines between connected nodes
+      for (const [node, neighbors] of Object.entries(connections)) {
+        for (const neighbor of neighbors) {
+          const latlngs = [nodeCoordinates[node], nodeCoordinates[neighbor]];
+          L.polyline(latlngs, { color: 'gray', weight: 2, dashArray: '4' }).addTo(map);
+        }
+      }
+
+      // Add clickable markers
+      for (const [name, coords] of Object.entries(nodeCoordinates)) {
+        const label = name === 'defaultStartNode' ? 'default starting node' : name;
+        const marker = L.circleMarker(coords, {
+          radius: 5,
+          color: 'red',
+          fillColor: 'red',
+          fillOpacity: 0.8
+        }).addTo(map).bindPopup(label);
+
+        marker.on('click', () => {
+          if (name === 'defaultStartNode') return;
+
+          const result = dijkstra(graph, 'defaultStartNode', name);
+          console.log("Route to", name, result);
+          drawRoute(result.path);
+
+          // Send message to React Native if not on web
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ROUTE_SELECTED',
+              destination: name,
+              distance: result.distance,
+              path: result.path
+            }));
           }
-          
-          // Add incident markers
-          ${generateMapMarkers()}
-          
-          setTimeout(() => map.invalidateSize(), 100);
-          map.attributionControl.setPrefix('');
-          L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
-          
-          // Make functions available globally for calling from React Native
-          window.dijkstra = dijkstra;
-          window.drawRoute = drawRoute;
-          window.nodeCoordinates = nodeCoordinates;
-          window.graph = graph;
         });
-      </script>
-    </body>
-    </html>`;
+      }
+
+      // Add incident markers
+      ${generateMapMarkers()}
+
+      setTimeout(() => map.invalidateSize(), 100);
+      map.attributionControl.setPrefix('');
+      L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
+
+      // Make functions available globally for calling from React Native
+      window.dijkstra = dijkstra;
+      window.drawRoute = drawRoute;
+      window.nodeCoordinates = nodeCoordinates;
+      window.graph = graph;
+    });
+  </script>
+</body>
+</html>`;
 
   const handleIncidentPress = (incident) => {
     if (incident.latitude && incident.longitude) {
@@ -1049,7 +1078,6 @@ const connections = {
           </View>
           <Text style={styles.listItemText}>Incident #{index + 1}</Text>
         </View>
-
         <View style={styles.incidentDetail}>
           <View style={styles.iconContainer}>
             <View style={styles.detailIcon}>
@@ -1058,7 +1086,6 @@ const connections = {
           </View>
           <Text style={styles.detailText}>{incident.username || 'Unknown'}</Text>
         </View>
-
         <View style={styles.incidentDetail}>
           <View style={styles.iconContainer}>
             <View style={styles.detailIcon}>
@@ -1069,7 +1096,6 @@ const connections = {
             Lat {incident.latitude?.toFixed(4) || 'N/A'}, Lng {incident.longitude?.toFixed(4) || 'N/A'}
           </Text>
         </View>
-
         <View style={styles.incidentActions}>
           <TouchableOpacity style={styles.miniAction}>
             <Text style={styles.miniActionText}>Details</Text>
@@ -1086,6 +1112,13 @@ const connections = {
     <View style={styles.container}>
       <View style={styles.leftContainer}>
         <View style={styles.titleContainer}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={handleBackPress}
+            activeOpacity={0.7}
+          >
+            <ArrowBackIcon style={{ fontSize: 28, color: '#007AFF' }} />
+          </TouchableOpacity>
           <View style={styles.titleIconContainer}>
             <NavigationOutlinedIcon style={{ fontSize: 40, color: 'blue' }} />
           </View>
@@ -1134,7 +1167,13 @@ const connections = {
               javaScriptEnabled={true}
               domStorageEnabled={true}
               startInLoadingState={true}
-              renderLoading={() => <ActivityIndicator size="large" color="#007AFF" style={styles.mapLoading} />}
+              renderLoading={() => (
+                <ActivityIndicator
+                  size="large"
+                  color="#007AFF"
+                  style={styles.mapLoading}
+                />
+              )}
               onError={(e) => console.error('WebView error:', e.nativeEvent)}
               onMessage={(event) => {
                 try {
@@ -1211,6 +1250,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#007AFF15',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   titleIconContainer: {
     width: 36,
@@ -1291,7 +1339,6 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
   },
-
   // Incident item styles
   listItem: {
     padding: 14,
@@ -1372,7 +1419,6 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontWeight: '600',
   },
-
   // Right container styles
   rightContainer: {
     flex: 2,
@@ -1399,7 +1445,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   // Bottom container styles
   bottomContainer: {
     padding: 18,
