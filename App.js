@@ -12,6 +12,7 @@ import MessagesScreen from './screens/MessagesScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import LogoutScreen from './screens/LogoutScreen';
 import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignupScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -20,7 +21,7 @@ const Stack = createStackNavigator();
 const CustomDrawerContent = ({ navigation, state }) => {
   const menuItems = [
     { name: 'Dashboard', icon: 'dashboard', route: 'Dashboard' },
-    { name: 'Navigation', icon: 'navigation', route: 'Navigation' },
+    { name: 'Navigation', icon: 'navigation', route: 'NavigationScreen' },
     { name: 'Messages', icon: 'message', route: 'Messages' },
     { name: 'Settings', icon: 'settings', route: 'Settings' },
     { name: 'Logout', icon: 'logout', route: 'Logout' },
@@ -77,28 +78,23 @@ const CustomDrawerContent = ({ navigation, state }) => {
   );
 };
 
-// Stack Navigator for screens that need to be pushed
-const MainStackNavigator = () => {
+// Authentication Stack Navigator (Login & Signup)
+const AuthStackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        cardStyle: { backgroundColor: '#F8F9FA' },
+        cardStyle: { backgroundColor: '#fff3f0' },
         animationEnabled: true,
-        animationTypeForReplace: 'push',
       }}
     >
-      <Stack.Screen name="Dashboard" component={DashboardScreen} />
-      <Stack.Screen name="Navigation" component={NavigationScreen} />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
-      <Stack.Screen name="Messages" component={MessagesScreen} />
-      <Stack.Screen name="Logout" component={LogoutScreen} />
-      {/* Add more stack screens as needed */}
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Sign Up" component={SignupScreen} />
     </Stack.Navigator>
   );
 };
 
-// Main Drawer Navigator
+// Main Drawer Navigator (for authenticated users)
 const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
@@ -112,11 +108,10 @@ const DrawerNavigator = () => {
         drawerType: 'slide',
         overlayColor: 'rgba(0, 0, 0, 0.5)',
       }}
-      initialRouteName="Main"
+      initialRouteName="Dashboard"
     >
-      <Drawer.Screen name="Main" component={MainStackNavigator} />
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
-      <Drawer.Screen name="Navigation" component={NavigationScreen} />
+      <Drawer.Screen name="NavigationScreen" component={NavigationScreen} />
       <Drawer.Screen name="Messages" component={MessagesScreen} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
       <Drawer.Screen name="Logout" component={LogoutScreen} />
@@ -124,11 +119,29 @@ const DrawerNavigator = () => {
   );
 };
 
+// Root Navigator (handles authentication flow)
+const RootNavigator = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animationEnabled: true,
+      }}
+    >
+      {/* Authentication Stack */}
+      <Stack.Screen name="Auth" component={AuthStackNavigator} />
+      
+      {/* Main App (Drawer Navigator) */}
+      <Stack.Screen name="Main" component={DrawerNavigator} />
+    </Stack.Navigator>
+  );
+};
+
 // Root App Component
 const App = () => {
   return (
     <NavigationContainer>
-      <DrawerNavigator />
+      <RootNavigator />
     </NavigationContainer>
   );
 };

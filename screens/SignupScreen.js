@@ -94,8 +94,11 @@ const SignupScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
         
-        <View style={styles.loginText}>
-          <Text>Already have an account? <TouchableOpacity onPress={() => navigation.navigate('Login')}><Text style={styles.loginLink}>Login</Text></TouchableOpacity></Text>
+        <View style={styles.loginTextContainer}>
+          <Text style={styles.loginText}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLink}>Login</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>
@@ -104,7 +107,7 @@ const SignupScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: '#fff30', // Light pink background color
+    backgroundColor: '#fff3f0', // Fixed: Light pink background color (was #fff30)
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'center',
@@ -117,12 +120,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)', // Border for the frosted effect
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Added semi-transparent background
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
     elevation: 10, // Shadow for Android
-    backdropFilter: 'blur(10px)', // Frosted glass effect (for web)
     alignItems: 'center', // Center-align content inside the container
   },
   logo: {
@@ -147,7 +150,7 @@ const styles = StyleSheet.create({
     marginBottom: 15, // Slightly less margin than login
     backgroundColor: 'rgba(255, 255, 255, 0.3)', // Semi-transparent white
     color: '#333',
-    textAlign: 'start',
+    textAlign: 'left', // Changed from 'start' to 'left' for better compatibility
     fontSize: 16,
   },
   button: {
@@ -164,13 +167,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  loginText: {
-    color: '#141414ff',
+  loginTextContainer: {
+    flexDirection: 'row', // Fixed: Proper layout for text and link
     marginTop: 15,
-    textAlign: 'center',
+    alignItems: 'center',
+  },
+  loginText: {
+    color: '#141414',
   },
   loginLink: {
-    color: '#181818ff',
+    color: '#181818',
     fontWeight: 'bold',
   }
 });
